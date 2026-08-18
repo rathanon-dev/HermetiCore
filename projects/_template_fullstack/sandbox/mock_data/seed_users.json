@@ -1,8 +1,0 @@
-{
-  "_comment": "Seed data for demo users. Committed to git as canonical test fixtures.",
-  "users": [
-    { "id": "alice-001", "username": "alice", "display_name": "Alice (Demo)", "role": "member" },
-    { "id": "bob-001",   "username": "bob",   "display_name": "Bob (Demo)",   "role": "member" },
-    { "id": "admin-001", "username": "admin", "display_name": "Admin",        "role": "admin"  }
-  ]
-}

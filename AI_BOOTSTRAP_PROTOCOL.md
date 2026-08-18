@@ -9,7 +9,7 @@
 
 > **MANDATORY HOST DETACHMENT DIRECTIVE:**
 > 1. **Zero-Trust Host Environment:** ไม่ว่า Host Machine จะมี Git, Node.js หรือ Python ติดตั้งอยู่ในระบบหรือไม่ก็ตาม **AI Agent ถูกสั่งห้ามใช้ Global Binary ของเครื่องเด็ดขาด**
-> 2. **Tier 1 Portable Primacy:** AI จะต้องดำเนินการติดตั้งและเรียกใช้ชุดคำสั่งผ่าน **Tier 1 Portable Toolchain** (`tools/git/cmd/git.exe`, `tools/node/node.exe`, `tools/python312/python.exe`) ภายในโฟลเดอร์ `HermetiCore` เท่านั้น
+> 2. **Tier 1 Portable Primacy:** AI จะต้องดำเนินการติดตั้งและเรียกใช้ชุดคำสั่งผ่าน **Tier 1 Portable Toolchain** (`tools/git/cmd/git.exe`, `tools/node/node.exe`, `tools/python/python.exe`) ภายในโฟลเดอร์ `HermetiCore` เท่านั้น
 > 3. **Session Path Shadowing:** ก่อนรันคำสั่งใดๆ AI ต้องตรวจสอบหรือทำการ Shadow PATH ใน Session เสมอ:
 >    ```powershell
 >    $env:PATH = "$PSScriptRoot\tools\git\cmd;$PSScriptRoot\tools\node;$PSScriptRoot\tools\python312;$env:PATH"

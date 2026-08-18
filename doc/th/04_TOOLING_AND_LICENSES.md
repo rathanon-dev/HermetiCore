@@ -38,7 +38,7 @@
 
 ### 2.5. Python 3.12 (AI & Data Science Engine)
 *   **Role:** รันไทม์หลักสำหรับ ComfyUI, PyTorch, และ AI Models แบบ Local
-*   **Fetch Method:** (สุดยอดเทคนิคสถาปัตยกรรม) แทนที่จะดึงไฟล์ `.zip` ธรรมดา ระบบทำการดึงผ่าน **NuGet API** (`python.3.12.nupkg` และ `pythonarm64`) ซึ่งเป็นแพ็กเกจที่ทำเพื่อ CI/CD ทำให้ได้ `pip` และ Environment ที่สมบูรณ์แบบโดยไม่ต้องดัดแปลงระบบแฮ็กแบบวิธีดั้งเดิม
+*   **Fetch Method:** แทนที่จะดึงไฟล์ `.zip` ธรรมดา ระบบทำการดึงผ่าน **NuGet API** (`python.3.12.nupkg` และ `pythonarm64`) ซึ่งเป็นแพ็กเกจที่ทำเพื่อ CI/CD ทำให้ได้ `pip` และ Environment ที่สมบูรณ์แบบโดยไม่ต้องดัดแปลงระบบแฮ็กแบบวิธีดั้งเดิม
 *   **License:** PSF License (Python Software Foundation License)
 *   **Source:** [python.org](https://www.python.org/) / [NuGet (Python)](https://www.nuget.org/packages/python)
 
@@ -56,4 +56,4 @@
 2. เราไม่มีการทำซ้ำ (Reproduce) หรือแจกจ่าย (Distribute) ทรัพย์สินทางปัญญาของ Third-Party ใดๆ
 3. ผู้ใช้งาน (End-User) จะเป็นผู้เชื่อมต่ออินเทอร์เน็ตและดาวน์โหลดไฟล์เหล่านั้นมาที่เครื่องตนเองตามสิทธิ์การใช้งานของแพลตฟอร์มต้นทาง 100%
 
-> 📝 **จัดทำโดย:** สถาปัตยกรรมระดับโลกที่ออกแบบโดย *@rathanon-dev*
+> 📝 **จัดทำโดย:** *@rathanon-dev*

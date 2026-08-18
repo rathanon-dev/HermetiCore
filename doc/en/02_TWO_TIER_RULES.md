@@ -8,7 +8,7 @@
 ## 1. Tier 1 (AI Control Plane)
 - **Location:** `tools/`, `.mcp/`, `.skills/`
 - **Scope:** Dedicated strictly to AI Agent Cognition & Orchestration.
-- **Host Detachment Axiom:** AI Agents MUST execute all tools using the hermetic Tier 1 toolchain (`tools/git`, `tools/node`, `tools/python312`). **Never rely on or invoke global Host binaries.**
+- **Host Detachment Axiom:** AI Agents MUST execute all tools using the hermetic Tier 1 toolchain (`tools/git`, `tools/node`, `tools/python`). **Never rely on or invoke global Host binaries.**
 - **Negative Rule:** Never execute `npm install` or `pip install` for project dependencies in Tier 1.
 
 ---
