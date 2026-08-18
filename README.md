@@ -31,21 +31,33 @@
 
 ## 🚀 เริ่มต้นใช้งานใน 10 วินาที (Quick Start)
 
-### 1. โคลน Repository
+เลือกระหว่างวิธี **1-Click (ไม่ต้องมี Git)** หรือวิธี **Git Clone มาตรฐาน**:
+
+### ⚡ วิธีที่ 1: 1-Click Zero-Git Installer (แนะนำสำหรับเครื่องใหม่ / ติดตั้งทันที)
+[![Download auto-install.bat](https://img.shields.io/badge/Download-auto--install.bat%20(No%20Git%20Required)-00F0FF?style=for-the-badge&logo=windows&logoColor=black)](https://github.com/rathanon-dev/HermetiCore/releases/latest/download/auto-install.bat)
+
+1. ดาวน์โหลดไฟล์ [`auto-install.bat`](https://github.com/rathanon-dev/HermetiCore/releases/latest/download/auto-install.bat) จาก GitHub Release
+2. วางไฟล์ไว้ในโฟลเดอร์ที่ต้องการ (เช่น Desktop หรือ `D:\`) แล้วดับเบิ้ลคลิกเพื่อรัน
+3. ระบบจะแตกไฟล์และสร้างสภาพแวดล้อม `HermetiCore` ให้พร้อมใช้งานทันทีโดยไม่ต้องลง Git!
+
+*(หรือรันคำสั่งบรรทัดเดียวผ่าน PowerShell)*:
+```powershell
+irm https://github.com/rathanon-dev/HermetiCore/releases/latest/download/auto-install.bat -OutFile auto-install.bat; .\auto-install.bat
+```
+
+---
+
+### 💻 วิธีที่ 2: Standard Git Clone (สำหรับเครื่องที่มี Git อยู่แล้ว)
 ```powershell
 git clone https://github.com/rathanon-dev/HermetiCore.git
 cd HermetiCore
-```
-
-### 2. รันสคริปต์ประกอบร่าง
-ดับเบิ้ลคลิกที่ไฟล์ **`start.bat`** (หรือรันผ่าน PowerShell):
-```powershell
 .\start.bat
 ```
 
-### 3. สั่งงาน AI Agent
+### 🤖 สั่งงาน AI Agent
 ส่งคำสั่งนี้ให้ AI (Antigravity / Claude / Copilot):
 > *"อ่านและปฏิบัติตามกฎใน `AI_BOOTSTRAP_PROTOCOL.md` ในโฟลเดอร์นี้ เพื่อเริ่มพัฒนาโปรเจกต์"*
+
 
 ---
 

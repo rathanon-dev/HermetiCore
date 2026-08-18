@@ -17,14 +17,22 @@ Welcome to **HermetiCore**, the universal, zero-footprint, self-assembling devel
 ---
 
 ## ⚡ Quick Start
+ 
+### ⚡ Option 1: 1-Click Zero-Git Installer (No Host Git Required)
+[![Download auto-install.bat](https://img.shields.io/badge/Download-auto--install.bat%20(No%20Git%20Required)-00F0FF?style=for-the-badge&logo=windows&logoColor=black)](https://github.com/rathanon-dev/HermetiCore/releases/latest/download/auto-install.bat)
 
-1. Double-click `start.bat` or run:
-   ```powershell
-   .\start.bat
-   ```
-2. The self-assembling engine will hydrate all toolchains into memory without touching system registries.
-3. Prompt your AI Agent:
-   > *"Read and execute the rules in `AI_BOOTSTRAP_PROTOCOL.md` in this directory."*
+1. Download [`auto-install.bat`](https://github.com/rathanon-dev/HermetiCore/releases/latest/download/auto-install.bat) from the latest GitHub Release.
+2. Double-click `auto-install.bat` anywhere to extract and provision the workspace automatically.
+
+### 💻 Option 2: Standard Git Clone
+```powershell
+git clone https://github.com/rathanon-dev/HermetiCore.git
+cd HermetiCore
+.\start.bat
+```
+
+### 🤖 Prompt your AI Agent
+> *"Read and execute the rules in `AI_BOOTSTRAP_PROTOCOL.md` in this directory."*
 
 ---
 

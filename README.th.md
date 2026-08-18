@@ -16,15 +16,24 @@
 
 ---
 
-## ⚡ วิธีการใช้งาน
+## ⚡ วิธีการใช้งาน (Quick Start)
 
-1. ดับเบิ้ลคลิก `start.bat` หรือรัน:
-   ```powershell
-   .\start.bat
-   ```
+### ⚡ วิธีที่ 1: 1-Click Zero-Git (ไม่ต้องมี Git ในเครื่อง)
+[![Download auto-install.bat](https://img.shields.io/badge/Download-auto--install.bat%20(No%20Git%20Required)-00F0FF?style=for-the-badge&logo=windows&logoColor=black)](https://github.com/rathanon-dev/HermetiCore/releases/latest/download/auto-install.bat)
+
+1. ดาวน์โหลด [`auto-install.bat`](https://github.com/rathanon-dev/HermetiCore/releases/latest/download/auto-install.bat) แล้วดับเบิ้ลคลิกเพื่อรัน
 2. ระบบจะดาวน์โหลดและแตกไฟล์ Toolchain ทั้งหมดแบบไร้การติดตั้ง
-3. ส่ง Prompt ให้ AI:
-   > *"อ่านและปฏิบัติตามกฎใน `AI_BOOTSTRAP_PROTOCOL.md` ในโฟลเดอร์นี้"*
+
+### 💻 วิธีที่ 2: Standard Git Clone
+```powershell
+git clone https://github.com/rathanon-dev/HermetiCore.git
+cd HermetiCore
+.\start.bat
+```
+
+### 🤖 สั่งงาน AI Agent
+ส่ง Prompt ให้ AI:
+> *"อ่านและปฏิบัติตามกฎใน `AI_BOOTSTRAP_PROTOCOL.md` ในโฟลเดอร์นี้"*
 
 ---
 
