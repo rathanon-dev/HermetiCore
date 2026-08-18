@@ -10,6 +10,9 @@ temp/
 *.7z
 *.tar.gz
 
+# Root lockfile (transient, auto-deleted by setup.ps1)
+.setup-lock
+
 # Node.js & Python dependencies
 node_modules/
 __pycache__/
@@ -22,10 +25,21 @@ env/
 logs/*.jsonl
 logs/*.log
 !logs/AI_MULTI_AGENT_LOG.md
+!logs/ADHD_STRESS_TEST_REPORT.md
 
 # Active Project Workspaces (Only keep the _template_fullstack)
 projects/*
 !projects/_template_fullstack/
+!projects/_template_fullstack/**
+
+# Ephemeral sandbox temp in ALL project pods — never commit test garbage
+projects/**/sandbox/temp/
+projects/**/sandbox/demo_users/**/cache/
+projects/**/sandbox/demo_users/**/storage/
+projects/**/runtime/.env.local
+
+# Playwright browser driver cache (Tier 1 — ephemeral)
+tools/playwright-browsers/
 
 # Sensitive Configs & Local Overrides
 config/*.key

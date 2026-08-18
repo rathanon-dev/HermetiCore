@@ -1,6 +1,12 @@
 # ======================================================================
-# METABASE AI (LabBase-5) SELF-ASSEMBLING MASTER ENGINE (HARDENED v1.1)
+# METABASE AI (LabBase-5) SELF-ASSEMBLING MASTER ENGINE (HARDENED v1.2)
 # Standard: ISO/IEC/IEEE 12207 | Zero-Global-Pollution | Windows Bare-Metal
+# ======================================================================
+# ADHD-Audit Fixes Applied (v1.2):
+#   - FIXED: Lockfile moved from temp/bootstrap.lock -> .setup-lock at root
+#   - FIXED: Root temp/ is now auto-deleted after all tools installed
+#   - FIXED: Drain barrier added to wait for child processes before temp wipe
+#   - POLICY: Root temp/ = TRANSIENT download staging ONLY, zero persistence
 # ======================================================================
 [CmdletBinding()]
 param (
@@ -15,14 +21,16 @@ $root = $PSScriptRoot
 if (-not $root) { $root = (Get-Location).Path }
 
 $toolsDir     = Join-Path $root "tools"
-$tempDir      = Join-Path $root "temp"
+$tempDir      = Join-Path $root "temp"        # TRANSIENT ONLY — auto-deleted after install
 $configDir    = Join-Path $root "config"
 $logsDir      = Join-Path $root "logs"
 $skillsDir    = Join-Path $root ".skills"
 $mcpDir       = Join-Path $root ".mcp"
 $docDir       = Join-Path $root "doc"
 $projectsDir  = Join-Path $root "projects"
-$lockFile     = Join-Path $tempDir "bootstrap.lock"
+
+# ADHD-Fix: Lockfile is now at ROOT (independent of temp/ lifecycle)
+$lockFile     = Join-Path $root ".setup-lock"
 
 $7zDir         = Join-Path $toolsDir "7zip"
 $7zExe         = Join-Path $7zDir "7za.exe"
@@ -36,20 +44,21 @@ $pythonDir     = Join-Path $toolsDir "python"
 $pythonExe     = Join-Path $pythonDir "python.exe"
 
 # 2. Prevent race conditions from multiple parallel double-clicks
-if (-not (Test-Path $tempDir)) { New-Item -ItemType Directory -Path $tempDir -Force | Out-Null }
+#    Lockfile is at ROOT — survives independently of temp/ folder
 if (-not (Test-Path $toolsDir)) { New-Item -ItemType Directory -Path $toolsDir -Force | Out-Null }
-if (-not (Test-Path $7zDir)) { New-Item -ItemType Directory -Path $7zDir -Force | Out-Null }
+if (-not (Test-Path $7zDir))    { New-Item -ItemType Directory -Path $7zDir -Force | Out-Null }
 if (-not (Test-Path $aria2Dir)) { New-Item -ItemType Directory -Path $aria2Dir -Force | Out-Null }
-if (-not (Test-Path $gitDir)) { New-Item -ItemType Directory -Path $gitDir -Force | Out-Null }
-if (-not (Test-Path $nodeDir)) { New-Item -ItemType Directory -Path $nodeDir -Force | Out-Null }
-if (-not (Test-Path $pythonDir)) { New-Item -ItemType Directory -Path $pythonDir -Force | Out-Null }
+if (-not (Test-Path $gitDir))   { New-Item -ItemType Directory -Path $gitDir -Force | Out-Null }
+if (-not (Test-Path $nodeDir))  { New-Item -ItemType Directory -Path $nodeDir -Force | Out-Null }
+if (-not (Test-Path $pythonDir)){ New-Item -ItemType Directory -Path $pythonDir -Force | Out-Null }
 
 if (Test-Path $lockFile) {
     $existingPid = Get-Content $lockFile -ErrorAction SilentlyContinue
     if ($existingPid -and (Get-Process -Id $existingPid -ErrorAction SilentlyContinue)) {
-        Write-Host " [WARN] Another bootstrap instance is already running (PID: $existingPid). Waiting..." -ForegroundColor Yellow
+        Write-Host " [WARN] Another bootstrap instance is already running (PID: $existingPid). Aborting." -ForegroundColor Yellow
         exit 0
     }
+    Write-Host " [INFO] Stale lockfile detected (PID: $existingPid is gone). Recovering..." -ForegroundColor Cyan
 }
 $PID | Set-Content $lockFile -Force
 
@@ -85,23 +94,29 @@ function Get-DownloadUrl {
     return $RawUrl
 }
 
-# 5. Vectorized directory scaffolding
-$folders = @($toolsDir, $tempDir, $configDir, $logsDir, $skillsDir, $mcpDir, $docDir, $projectsDir, $7zDir, $aria2Dir, $gitDir, $nodeDir, $pythonDir)
+# 5. Vectorized directory scaffolding (temp/ is NOT pre-scaffolded — created on demand only)
+$folders = @($toolsDir, $configDir, $logsDir, $skillsDir, $mcpDir, $docDir, $projectsDir, $7zDir, $aria2Dir, $gitDir, $nodeDir, $pythonDir)
 foreach ($f in $folders) {
     if (-not (Test-Path $f)) { New-Item -ItemType Directory -Path $f -Force | Out-Null }
+}
+
+# Helper: Ensure temp staging dir exists (created on demand, not pre-scaffolded)
+function Ensure-TempDir {
+    if (-not (Test-Path $tempDir)) { New-Item -ItemType Directory -Path $tempDir -Force | Out-Null }
 }
 
 # 6. Bootstrap 7-Zip with Zone.Identifier Stripping
 if (-not (Test-Path $7zExe)) {
     Write-Host " [*] [1/5] Fetching 7za.exe via NuGet API..." -ForegroundColor Cyan
+    Ensure-TempDir
     $nugetUrl = "https://www.nuget.org/api/v2/package/7-Zip.CommandLine"
     $targetZip = Join-Path $tempDir "7z.zip"
     Invoke-WebRequest -Uri (Get-DownloadUrl $nugetUrl) -OutFile $targetZip -UseBasicParsing
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     [System.IO.Compression.ZipFile]::ExtractToDirectory($targetZip, "$tempDir\7z_out")
     $found7z = Get-ChildItem "$tempDir\7z_out" -Filter "7za.exe" -Recurse | Select-Object -First 1
-    if ($found7z) { 
-        Copy-Item $found7z.FullName $7zExe -Force 
+    if ($found7z) {
+        Copy-Item $found7z.FullName $7zExe -Force
         Unblock-File -Path $7zExe -ErrorAction SilentlyContinue
     }
     Remove-Item $targetZip -Force -ErrorAction SilentlyContinue
@@ -112,13 +127,14 @@ if (-not (Test-Path $7zExe)) {
 # 7. Bootstrap Aria2 with Unblock-File
 if (-not (Test-Path $aria2Exe)) {
     Write-Host " [*] [2/5] Fetching Aria2c Portable..." -ForegroundColor Cyan
+    Ensure-TempDir
     $ariaUrl = "https://github.com/aria2/aria2/releases/download/release-1.37.0/aria2-1.37.0-win-64bit-build1.zip"
     $ariaZip = Join-Path $tempDir "aria2.zip"
     Invoke-WebRequest -Uri (Get-DownloadUrl $ariaUrl) -OutFile $ariaZip -UseBasicParsing
     & $7zExe x $ariaZip "-o$tempDir\aria_tmp" -y | Out-Null
     $extractedAria = Get-ChildItem "$tempDir\aria_tmp" -Filter "aria2c.exe" -Recurse | Select-Object -First 1
-    if ($extractedAria) { 
-        Copy-Item $extractedAria.FullName $aria2Exe -Force 
+    if ($extractedAria) {
+        Copy-Item $extractedAria.FullName $aria2Exe -Force
         Unblock-File -Path $aria2Exe -ErrorAction SilentlyContinue
     }
     Remove-Item "$tempDir\aria_tmp" -Recurse -Force -ErrorAction SilentlyContinue
@@ -129,6 +145,7 @@ if (-not (Test-Path $aria2Exe)) {
 # 8. Bootstrap MinGit (8-Connection Accelerated)
 if (-not (Test-Path $gitExe)) {
     Write-Host " [*] [3/5] Fetching MinGit Portable..." -ForegroundColor Cyan
+    Ensure-TempDir
     $gitUrl = "https://github.com/git-for-windows/git/releases/download/v2.46.0.windows.1/MinGit-2.46.0-64-bit.zip"
     $gitZip = Join-Path $tempDir "git.zip"
     & $aria2Exe -x 8 -s 8 -d $tempDir -o "git.zip" (Get-DownloadUrl $gitUrl) | Out-Null
@@ -141,13 +158,14 @@ if (-not (Test-Path $gitExe)) {
 # 9. Bootstrap Node.js LTS
 if (-not (Test-Path $nodeExe)) {
     Write-Host " [*] [4/5] Fetching Node.js LTS Portable..." -ForegroundColor Cyan
+    Ensure-TempDir
     $nodeUrl = "https://nodejs.org/dist/v20.17.0/node-v20.17.0-win-x64.zip"
     $nodeZip = Join-Path $tempDir "node.zip"
     & $aria2Exe -x 8 -s 8 -d $tempDir -o "node.zip" (Get-DownloadUrl $nodeUrl) | Out-Null
     & $7zExe x $nodeZip "-o$tempDir\node_tmp" -y | Out-Null
     $extractedNode = Get-ChildItem "$tempDir\node_tmp" -Directory | Select-Object -First 1
-    if ($extractedNode) { 
-        Copy-Item "$($extractedNode.FullName)\*" $nodeDir -Recurse -Force 
+    if ($extractedNode) {
+        Copy-Item "$($extractedNode.FullName)\*" $nodeDir -Recurse -Force
         Get-ChildItem -Path $nodeDir -Filter "*.exe" -Recurse | ForEach-Object { Unblock-File $_.FullName -ErrorAction SilentlyContinue }
     }
     Remove-Item "$tempDir\node_tmp" -Recurse -Force -ErrorAction SilentlyContinue
@@ -158,6 +176,7 @@ if (-not (Test-Path $nodeExe)) {
 # 10. Bootstrap Python 3.12 Embedded
 if (-not (Test-Path $pythonExe)) {
     Write-Host " [*] [5/5] Fetching Python 3.12 Embedded..." -ForegroundColor Cyan
+    Ensure-TempDir
     $pyUrl = "https://www.python.org/ftp/python/3.12.5/python-3.12.5-embed-amd64.zip"
     $pyZip = Join-Path $tempDir "python.zip"
     & $aria2Exe -x 8 -s 8 -d $tempDir -o "python.zip" (Get-DownloadUrl $pyUrl) | Out-Null
@@ -167,7 +186,28 @@ if (-not (Test-Path $pythonExe)) {
     Write-Host " [OK] Python 3.12 Initialized." -ForegroundColor Green
 }
 
-# 11. Cleanup lockfile
+# 11. ADHD-Fix: DRAIN BARRIER — Wait for child processes to release handles
+#     before wiping root temp/ to avoid EBUSY/AccessDenied on Windows
+if (Test-Path $tempDir) {
+    Write-Host " [*] Drain barrier: waiting for download handles to close..." -ForegroundColor DarkGray
+    $drainWait = 0
+    while ($drainWait -lt 10) {
+        $activeChildren = Get-Process -Name @("7za","aria2c") -ErrorAction SilentlyContinue |
+            Where-Object { $_.Path -and $_.Path.StartsWith($root, [System.StringComparison]::InvariantCultureIgnoreCase) }
+        if (-not $activeChildren) { break }
+        Start-Sleep -Milliseconds 300
+        $drainWait++
+    }
+    # Wipe root temp/ — TRANSIENT download staging area, must not persist
+    Remove-Item -Path $tempDir -Recurse -Force -ErrorAction SilentlyContinue
+    if (-not (Test-Path $tempDir)) {
+        Write-Host " [OK] Root temp/ staging area cleaned (zero-persistence policy enforced)." -ForegroundColor DarkGray
+    } else {
+        Write-Host " [WARN] Root temp/ could not be fully removed (file handle lock). Will clean on next run." -ForegroundColor Yellow
+    }
+}
+
+# 12. Release root lockfile
 if (Test-Path $lockFile) { Remove-Item $lockFile -Force -ErrorAction SilentlyContinue }
 
 Write-Host "`n ======================================================================" -ForegroundColor Green
