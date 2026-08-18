@@ -1,54 +1,40 @@
-<a id="top"></a>
+# 🇹🇭 MetaBase-AI (LabBase-5) - คู่มือฉบับภาษาไทย
 
-# 🏛️ MetaBase AI (LabBase-5) - คู่มือฉบับภาษาไทย
-[🏠 หน้าหลัก (Home)](README.md) | [🇬🇧 Read in English](README.en.md) | [🗺️ แผนที่โครงการ (Projects Map)](PROJECTS_MAP.md)
-
-[![TH](https://img.shields.io/badge/lang-th-green.svg)](README.th.md)
-[![EN](https://img.shields.io/badge/lang-en-blue.svg)](README.en.md)
-[![Standard: ISO/IEC/IEEE 12207](https://img.shields.io/badge/Standard-ISO%2FIEC%2FIEEE%2012207-blue.svg)](https://www.iso.org/standard/63711.html)
-[![Standard: ISO/IEC/IEEE 42010](https://img.shields.io/badge/Standard-ISO%2FIEC%2FIEEE%2042010-blue.svg)](https://www.iso.org/standard/74427.html)
-[![Twelve-Factor: Compliant](https://img.shields.io/badge/Twelve--Factor-Compliant-success.svg)](https://12factor.net/)
+ยินดีต้อนรับสู่ **MetaBase-AI** สภาพแวดล้อมพัฒนาระบบ AI แบบ Bare-Metal พกพา ไม่ทิ้งร่องรอย และกักขังการทำงาน 100%
 
 ---
 
-## 🧭 1. ปรัชญาและแนวคิดการออกแบบ (Design Philosophy)
+## 🏛️ สถาปัตยกรรมแบบ 2 ชั้น (Two-Tier Architecture)
 
-**MetaBase AI** ถูกสร้างขึ้นบนแนวคิด **"Zero-Global-Pollution & Mechanical Sympathy"**:
-1. **ไม่แตะต้อง System PATH:** คอมพิวเตอร์ของระบบหลักจะสะอาด 100% เสมอ
-2. **ไม่ใช้ Docker บน Windows:** ตัดปัญหาการกินแรม 4–8 GB ของ WSL2/vmmem และปัญหาความหน่วงของ Cross-Filesystem
-3. **ทำงานร่วมกับ AI ได้ทุกค่าย:** ด้วยมาตรฐาน Model Context Protocol (MCP) และ Two-Tier Sandbox
-
----
-
-## 🛠️ 2. การทำงานของ Tier 1 และ Tier 2
-
-### 🔹 Tier 1 (AI Control Plane):
-- โฟลเดอร์ `tools/` มีเครื่องมือระดับราก: 7-Zip, Aria2, MinGit, Node LTS, Python 3.12
-- เป็นเครื่องมือประจำตัวของ AI ในการทำบรีฟงาน สเก็ตช์ภาพ และสร้างแม่แบบ
-- **ห้ามติดตั้ง npm หรือ pip ของโปรเจกต์ลงในนี้เด็ดขาด**
-
-### 🔹 Tier 2 (Project Data Plane):
-- โฟลเดอร์ `projects/<name>/runtime/` คือรันไทม์เฉพาะของแต่ละงาน
-- เมื่อสั่ง `npm install` หรือ `pip install` ทุกอย่างจะถูกขังไว้ในโฟลเดอร์โปรเจกต์นั้น 100%
+1. **Tier 1 (AI Control Plane):**
+   - โฟลเดอร์ `tools/`, `.mcp/`, `.skills/`
+   - สำหรับให้ AI Agent ใช้สำรวจ Draft และสั่งงาน MCP Servers
+   - ห้ามติดตั้งแพ็กเกจของโปรเจกต์ลงในชั้นนี้เด็ดขาด
+2. **Tier 2 (Project Data Plane):**
+   - โฟลเดอร์ `projects/<name>/runtime/`
+   - กักขัง Dependencies ทั้งหมด (`node_modules`, `.venv`, CUDA DLLs) ไว้ภายในโปรเจกต์ 100%
 
 ---
 
-## 🚀 3. ขั้นตอนการพัฒนา (End-to-End Workflow)
+## ⚡ วิธีการใช้งาน
 
-```
-[1. specs/ (ความต้องการ)] ──> [2. design/ (ภาพร่าง/Figma)] ──> [3. services/ (เขียนโค้ด)] 
-                                                                    │
-[6. repo/ (ซิงค์ขึ้น Git)] <── [5. staging/human/ (คนตรวจรับ)] <── [4. staging/ai/ (AI เทสต์)]
-```
+1. ดับเบิ้ลคลิก `start.bat` หรือรัน:
+   ```powershell
+   .\start.bat
+   ```
+2. ระบบจะดาวน์โหลดและแตกไฟล์ Toolchain ทั้งหมดแบบไร้การติดตั้ง
+3. ส่ง Prompt ให้ AI:
+   > *"อ่านและปฏิบัติตามกฎใน `AI_BOOTSTRAP_PROTOCOL.md` ในโฟลเดอร์นี้"*
 
 ---
 
 ## 📖 เอกสารเชิงลึก
-- [สถาปัตยกรรมระบบ (Architecture)](doc/th/01_ARCHITECTURE.md)
-- [กฎเหล็กการแยกขาด 2 ชั้น (Two-Tier Rules)](doc/th/02_TWO_TIER_RULES.md)
+- 🏛️ [01_ARCHITECTURE.md - ภาพรวมสถาปัตยกรรมระบบ](doc/th/01_ARCHITECTURE.md)
+- 🔒 [02_TWO_TIER_RULES.md - กฎเหล็กการแยกขาด 2 ชั้น](doc/th/02_TWO_TIER_RULES.md)
+- 🎭 [03_PLAYWRIGHT_MCP_SPEC.md - มาตรฐาน Playwright Browser MCP](doc/th/03_PLAYWRIGHT_MCP_SPEC.md)
 
 ---
 
-[🏠 หน้าหลัก (Home)](README.md) | [🇬🇧 Read in English](README.en.md) | [⬆️ กลับขึ้นด้านบน (Back to Top)](#top)
+[⬅️ กลับสู่หน้าหลัก (README.md)](README.md) | [🇬🇧 English Documentation](README.en.md)
 
 *จัดทำโดย: [@rathanon-dev](https://github.com/rathanon-dev)*

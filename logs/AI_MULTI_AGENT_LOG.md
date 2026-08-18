@@ -10,6 +10,7 @@ This document continuously tracks all autonomous actions, architectural decision
 | `2026-08-19 02:01:25` | `Gemini AI` | Fix `setup.ps1` Path & Variable Typos | `COMPLETED` | Resolved `$ariaExe` null reference & added directory pre-scaffolding. |
 | `2026-08-19 02:07:36` | `ADHD-Ideator` | Execute 10-Scenario Automated Stress-Test Matrix | `COMPLETED` | 100% PASS on Cold Boot, Warm Boot, Mutex Lock, and Ephemeral Telemetry. |
 | `2026-08-19 02:16:35` | `Gemini AI` | Expand Top-Tier MCP Fleet & Modern PEP 621 Standard | `COMPLETED` | Integrated Neo4j, Redis, Postgres, SQLite, Puppeteer, PyWin32, and `pyproject.toml`. |
+| `2026-08-19 02:19:15` | `Lead Architect` | Enforce Microsoft Playwright Standard & Specification | `COMPLETED` | Deprecated Puppeteer in favor of Playwright MCP (`@executeautomation/playwright-mcp-server`) with multi-context & auto-waiting. |
 
 ---
 
@@ -25,13 +26,13 @@ This document continuously tracks all autonomous actions, architectural decision
    - **Pillar 3:** Python 3.12 (Embedded) with modern `pyproject.toml` (PEP 517/518/621) standard.
 
 3. **Expanded Top-Tier MCP Fleet (`.mcp/mcp_servers.json`):**
+   - 🎭 `browser-playwright`: Microsoft Playwright Multi-Context, Auto-Waiting, Anti-Flake, and Proxy Spoofing browser engine.
    - 🕸️ `neo4j`: Graph Database & Knowledge Graph Cypher query engine.
    - ⚡ `redis`: In-Memory high-speed cache & pub/sub message queue.
    - 🗄️ `postgres` & `sqlite`: Enterprise relational & embedded SQL engines.
-   - 🌐 `browser-puppeteer`: Isolated headless browser automation with proxy injection & independent user data sandboxes.
    - 🪟 `pywin`: Windows OS native Win32 API & process management via Python.
    - 🧠 `adhd-ideator`: Divergent 5-frame cognitive stress-testing engine.
 
 ---
 
-[⬅️ กลับสู่หน้าหลัก (Back to README)](../README.md) | [🏛️ สถาปัตยกรรมระบบ](../doc/th/01_ARCHITECTURE.md)
+[⬅️ กลับสู่หน้าหลัก (Back to README)](../README.md) | [🏛️ สถาปัตยกรรมระบบ](../doc/th/01_ARCHITECTURE.md) | [🎭 มาตรฐาน Playwright MCP](../doc/th/03_PLAYWRIGHT_MCP_SPEC.md)

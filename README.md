@@ -1,51 +1,47 @@
 <a id="top"></a>
 
-# 🏛️ MetaBase AI (LabBase-5)
-> **สถานีพัฒนาซอฟต์แวร์แบบพกพาสำหรับ AI สากล (Zero-Global-Pollution)**
+<div align="center">
 
-[![TH](https://img.shields.io/badge/lang-th-green.svg)](README.th.md)
-[![EN](https://img.shields.io/badge/lang-en-blue.svg)](README.en.md)
-[![Standard: ISO/IEC/IEEE 12207](https://img.shields.io/badge/Standard-ISO%2FIEC%2FIEEE%2012207-blue.svg)](https://www.iso.org/standard/63711.html)
-[![Standard: ISO/IEC/IEEE 42010](https://img.shields.io/badge/Standard-ISO%2FIEC%2FIEEE%2042010-blue.svg)](https://www.iso.org/standard/74427.html)
-[![Twelve-Factor: Compliant](https://img.shields.io/badge/Twelve--Factor-Compliant-success.svg)](https://12factor.net/)
-[![Platform: Windows Bare--Metal](https://img.shields.io/badge/Platform-Windows%20Bare--Metal%20(No%20Docker)-orange.svg)]()
-[![AI Protocol: Anthropic MCP](https://img.shields.io/badge/Protocol-Anthropic%20MCP%20Ready-purple.svg)]()
+# ⚡ METABASE AI (LABBASE-5)
+### Autonomous Zero-Footprint Engineering Workstation
+**The Universal, Self-Assembling Developer Environment for Autonomous AI Agents**
 
-> 🌐 **Navigation:** **[🏠 หน้าหลัก (Home)](README.md)** | **[🇹🇭 ภาษาไทย (TH)](README.th.md)** | **[🇬🇧 English (EN)](README.en.md)** | **[🗺️ แผนที่โครงการ (Projects Map)](PROJECTS_MAP.md)**
+[![Status](https://img.shields.io/badge/Status-Production%20Ready-00F0FF.svg?style=for-the-badge&logo=rocket)](https://github.com/rathanon-dev/MetaBase-AI)
+[![Architecture](https://img.shields.io/badge/Standard-ISO%2FIEC%2FIEEE%2012207-7928CA.svg?style=for-the-badge&logo=blueprint)](doc/th/01_ARCHITECTURE.md)
+[![Separation](https://img.shields.io/badge/Isolation-Two--Tier%20Hermetic-00DF72.svg?style=for-the-badge&logo=shield)](doc/th/02_TWO_TIER_RULES.md)
+[![Playwright](https://img.shields.io/badge/Browser-Playwright%20MCP-FF0055.svg?style=for-the-badge&logo=playwright)](doc/th/03_PLAYWRIGHT_MCP_SPEC.md)
 
 ---
 
-## 📌 ภาพรวมสถาปัตยกรรม (Architecture Overview)
+**[🇹🇭 ภาษาไทย (TH)](README.th.md)** | **[🇬🇧 English (EN)](README.en.md)** | **[🏛️ สถาปัตยกรรมระบบ](doc/th/01_ARCHITECTURE.md)** | **[🔒 กฎเหล็ก 2 ชั้น](doc/th/02_TWO_TIER_RULES.md)** | **[🎭 มาตรฐาน Playwright MCP](doc/th/03_PLAYWRIGHT_MCP_SPEC.md)**
 
-**MetaBase AI (LabBase-5)** คือระบบสถานีพัฒนาซอฟต์แวร์พกพาแบบไร้ขยะ (Zero-Footprint Autonomous Workstation) สำหรับการทำงานร่วมกับ AI Agent ยุคใหม่ (Antigravity, Claude Code, Copilot) โดยทำงานบน Windows แบบ Bare-Metal ไม่ต้องติดตั้งโปรแกรมลงใน System PATH, ไม่ต้องพึ่งพา Docker, และไม่กินแรมเครื่อง
-
-### ✨ คุณสมบัติเด่น (Core Highlights)
-1. **⚡ Spore Self-Assembly (งอกระบบใน 1 คลิก):**
-   - ตัว Git Repo มีขนาดเล็กจิ๋ว (< 80 KB) เพียงดับเบิ้ลคลิก `start.bat` ระบบจะดาวน์โหลด 7z, Aria2, Git, Node LTS, Python 3.12 และกางโฟลเดอร์ให้พร้อมใช้งานใน 10 วินาที
-2. **🏛️ กฎเหล็กการแยกขาด 2 ชั้น (Two-Tier Hermetic Separation):**
-   - **Tier 1 (AI Control Plane):** คลังเครื่องมือและ MCP ของ AI (7z, Git, Node, Python, Chrome DevTools MCP, ADHD Engine) สะอาดและไม่มีวันพัง
-   - **Tier 2 (Project Data Plane):** โปรเจกต์แต่ละตัวมี `runtime/` เฉพาะของตัวเอง แพ็กเกจ `node_modules` และไลบรารีจะไม่ย้อนกลับมากวนระบบส่วนกลาง
-3. **🌐 OmniProxy LAN Acceleration:**
-   - ตรวจจับ Caching Gateway อัตโนมัติ (`http://192.168.1.10:8080`) ช่วยสตรีมไฟล์ขนาดใหญ่ผ่าน LAN ด้วยความเร็วสูง
-4. **📋 กระบวนการต้นน้ำ สู่ ปลายน้ำ (End-to-End Lifecycle):**
-   - สกัด Requirement ใน `specs/` $\rightarrow$ ดีไซน์ใน `design/` $\rightarrow$ โค้ดใน `services/` $\rightarrow$ ตรวจรับงานใน `staging/human/` $\rightarrow$ ปล่อยงานใน `repo/`
+</div>
 
 ---
 
-## 🚀 วิธีการติดตั้งและเริ่มต้นใช้งาน (Quick Start)
+## 🌟 จุดเด่นของระบบ (Core Capabilities)
 
-### 1. ดาวน์โหลดหรือโคลนโปรเจกต์
+- ⚡ **1-Click Self-Assembly:** โคลนโปรเจกต์ขนาดเพียง **~95 KB** แล้วดับเบิ้ลคลิก `start.bat` ระบบจะประกอบร่าง Toolchains ทั้งหมดให้ใน 10 วินาที
+- 🔒 **Two-Tier Hermetic Separation:** แบ่งแยก **Tier 1 (เครื่องมือ AI / MCP / Skills)** ออกจาก **Tier 2 (ซอร์สโค้ด / Runtime / .venv)** เด็ดขาด 100%
+- 🎭 **Mandatory Microsoft Playwright MCP:** ควบคุมเบราว์เซอร์อัตโนมัติด้วย Playwright แยก Context ไร้การรั่วไหลของคุกกี้ และรองรับ Proxy LAN
+- 🚀 **LAN Acceleration Aware:** ตรวจจับ **OmniProxy LAN Gateway** (`192.168.1.10:8080`) อัตโนมัติ ดาวน์โหลดและติดตั้งความเร็วระดับ LAN
+- 🧠 **Embedded ADHD Divergent Engine:** ฝังระบบระดมความคิดและทดสอบสถาปัตยกรรมแบบคู่ขนาน 5 มิติ
+
+---
+
+## 🚀 เริ่มต้นใช้งานใน 10 วินาที (Quick Start)
+
+### 1. โคลน Repository
 ```powershell
 git clone https://github.com/rathanon-dev/MetaBase-AI.git
 cd MetaBase-AI
 ```
 
-### 2. รันระบบในคลิกเดียว
-ดับเบิ้ลคลิกไฟล์ **`start.bat`** (หรือรันผ่าน PowerShell):
+### 2. รันสคริปต์ประกอบร่าง
+ดับเบิ้ลคลิกที่ไฟล์ **`start.bat`** (หรือรันผ่าน PowerShell):
 ```powershell
 .\start.bat
 ```
-*ระบบจะตรวจสอบเครือข่าย ดาวน์โหลดเครื่องมือ Tier 1 และเปิดหน้าต่าง Terminal พร้อมคำสั่งเริ่มต้นให้ทันที*
 
 ### 3. สั่งงาน AI Agent
 ส่งคำสั่งนี้ให้ AI (Antigravity / Claude / Copilot):
@@ -66,8 +62,8 @@ MetaBase-AI/
 │
 ├── tools/                    # 🛠️ [Tier 1] คลังรันไทม์พกพา (7z, Aria2, Git, Node, Python)
 ├── .skills/adhd/             # 🧠 [AI Cognitive] ADHD Divergent Ideation Engine
-├── .mcp/                     # 🔌 [AI Tools] Chrome DevTools, Filesystem, SQLite, Git MCP
-├── logs/                     # 📋 [Logs] system_log.jsonl & AI_MULTI_AGENT_LOG.md
+├── .mcp/                     # 🔌 [AI Tools] Playwright, Neo4j, Redis, SQLite, Git, Shell
+├── logs/                     # 📋 [Logs] AI_MULTI_AGENT_LOG.md & ADHD_STRESS_TEST_REPORT.md
 ├── config/                   # 🔑 [Config] SSH Keys & OmniProxy settings
 ├── doc/                      # 📚 [Docs] คู่มือฉบับเต็มภาษาไทย (doc/th) และอังกฤษ (doc/en)
 │
@@ -82,9 +78,11 @@ MetaBase-AI/
 - 🇹🇭 **ภาษาไทย (Thai):**
   - [สถาปัตยกรรมระบบ (Architecture)](doc/th/01_ARCHITECTURE.md)
   - [กฎเหล็กการแยกขาด 2 ชั้น (Two-Tier Rules)](doc/th/02_TWO_TIER_RULES.md)
+  - [มาตรฐาน Playwright Browser MCP (Autify Benchmark)](doc/th/03_PLAYWRIGHT_MCP_SPEC.md)
 - 🇬🇧 **English (EN):**
   - [System Architecture](doc/en/01_ARCHITECTURE.md)
   - [Two-Tier Hermetic Rules](doc/en/02_TWO_TIER_RULES.md)
+  - [Playwright Browser MCP Specification](doc/en/03_PLAYWRIGHT_MCP_SPEC.md)
 
 ---
 

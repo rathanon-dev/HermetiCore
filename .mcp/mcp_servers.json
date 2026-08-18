@@ -22,14 +22,15 @@
       "args": ["-y", "powershell-mcp"],
       "description": "Native Windows PowerShell 5.1 & 7.x Execution, System Monitoring & Telemetry"
     },
-    "browser-puppeteer": {
+    "browser-playwright": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
+      "args": ["-y", "@executeautomation/playwright-mcp-server"],
       "env": {
-        "PUPPETEER_CACHE_DIR": "./temp/puppeteer_cache",
-        "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "false"
+        "PLAYWRIGHT_BROWSERS_PATH": "./tools/playwright-browsers",
+        "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "0",
+        "HEADLESS": "true"
       },
-      "description": "Isolated Headless Browser Automation, UI Visual Verification, E2E Testing & Proxy Spoofing"
+      "description": "Mandatory AI Browser Engine (Playwright Multi-Context, Auto-Waiting, Anti-Flake, Proxy Spoofing & Zero-Leak Sandbox)"
     },
     "filesystem": {
       "command": "npx",

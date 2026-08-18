@@ -1,8 +1,8 @@
 # 🧪 รายงานผลการทดสอบความทนทานระบบ MetaBase-AI (ADHD Stress-Test Report)
 
-- **วันและเวลาที่ทดสอบ:** 2026-08-19 02:17:47
+- **วันและเวลาที่ทดสอบ:** 2026-08-19 02:20:21
 - **ตำแหน่งโฟลเดอร์ทดสอบ:** `D:\MetaBase-AI`
-- **เวลารวมในการทดสอบทุกกรณี:** 29.51 วินาที
+- **เวลารวมในการทดสอบทุกกรณี:** 27.30 วินาที
 - **ผลสรุปภาพรวม:** ✅ **ผ่านการทดสอบครบทุกกรณี 100% (100% RELIABLE)**
 
 ---
@@ -11,16 +11,16 @@
 
 | หมวดหมู่ (Category) | กรณีทดสอบ (Scenario) | สถานะ | เวลา | รายละเอียดทางวิศวกรรม / หลักฐานการทดสอบ |
 |---|---|:---:|:---:|---|
-| **Cold Boot** | `setup.ps1 -AutoBootstrap` | ✅ PASS | 13.17s | ติดตั้งเครื่องมือครบ 5 ตัว (7z, Aria2, Git, Node, Python) และปลดล็อก Zone.Identifier สำเร็จ |
+| **Cold Boot** | `setup.ps1 -AutoBootstrap` | ✅ PASS | 11.14s | ติดตั้งเครื่องมือครบ 5 ตัว (7z, Aria2, Git, Node, Python) และปลดล็อก Zone.Identifier สำเร็จ |
 | **Batch Validation** | `start.bat` Integrity | ✅ PASS | 0.00s | เรียกใช้ `setup.ps1` และฉีด Ephemeral Session PATH สมบูรณ์ |
 | **Batch Validation** | `start-workspace.bat` Integrity | ✅ PASS | 0.00s | ตรวจจับเครื่องมือและเปิด Session Shell สมบูรณ์ |
 | **Batch Validation** | `auto-install.bat` Integrity | ✅ PASS | 0.00s | มีจุดเชื่อมต่อ Bootstrap และส่งต่อ Workspace สมบูรณ์ |
 | **Batch Validation** | `auto-install-ai-workstation.bat` Integrity | ✅ PASS | 0.00s | บูตสแตรปเครื่องมือและแสดงผลให้ผู้ใช้เข้าใจง่าย |
 | **Warm Boot** | `setup.ps1` Fast-Path Skip | ✅ PASS | 1.02s | ข้ามการดาวน์โหลดซ้ำทั้งหมดในเวลาเพียง 1.02 วินาที |
 | **Warm Boot** | `start.bat` Instant Path Skip | ✅ PASS | 0.00s | ตรวจพบเครื่องมือทันที (<0.02s) ทำงานต่อโดยไม่แตะเน็ต |
-| **Concurrency** | Simultaneous Double-Click Lock | ✅ PASS | 12.32s | ระบบ PID Mutex Lock ป้องกันไฟล์ชนกันเมื่อกดเบิ้ลหรือรันซ้ำ |
-| **Self-Healing** | Dead Lockfile PID Recovery | ✅ PASS | 1.01s | ตรวจจับ Lockfile ตกค้างจากโปรเซสที่ตายแล้ว และปลดล็อกอัตโนมัติ |
-| **MCP Fleet** | Top-Tier MCP Hub Registry | ✅ PASS | 0.05s | ลงทะเบียน MCP ครบ 7 ตัวหลัก (Neo4j Graph, Redis, Postgres, SQLite, Puppeteer, PyWin, ADHD) |
+| **Concurrency** | Simultaneous Double-Click Lock | ✅ PASS | 10.49s | ระบบ PID Mutex Lock ป้องกันไฟล์ชนกันเมื่อกดเบิ้ลหรือรันซ้ำ |
+| **Self-Healing** | Dead Lockfile PID Recovery | ✅ PASS | 1.02s | ตรวจจับ Lockfile ตกค้างจากโปรเซสที่ตายแล้ว และปลดล็อกอัตโนมัติ |
+| **MCP Fleet** | Playwright & Top-Tier MCP Hub Registry | ✅ PASS | 0.05s | ลงทะเบียน MCP ครบทั้ง 7 คลาสหลัก: **Microsoft Playwright Browser Engine, Neo4j Graph, Redis, Postgres, SQLite, PyWin32, ADHD** |
 | **Modern Standards** | PEP 621 pyproject.toml Standard | ✅ PASS | 0.00s | แม่แบบโปรเจกต์รองรับมาตรฐาน PEP 517/518/621 pyproject.toml ครบถ้วน |
 | **Telemetry** | Ephemeral Toolchain Execution | ✅ PASS | 0.35s | Git, Node, Python, Aria2 รันผ่าน Session PATH ได้ทุกตัว |
 
@@ -42,10 +42,10 @@
 2. **Warm-Boot Idempotency (เปิดซ้ำเมื่อมีแล้ว):** เช็คข้ามได้ในเวลาไม่ถึง 1.5 วินาที ไม่เปลืองเน็ตและไม่ดาวน์โหลดซ้ำ
 3. **Double-Click Collision (กดซ้ำ/กดหลายตัวพร้อมกัน):** ระบบใช้ PID Mutex Lock (`temp/bootstrap.lock`) บล็อกโปรเซสที่สองทันที ไม่เกิดปัญหาไฟล์ทับกันจนพัง
 4. **Dead PID Recovery (การกู้คืนเมื่อโปรเซสเก่าค้าง):** ระบบตรวจจับหมายเลข PID ที่ตายแล้ว และปลดล็อกตัวเองอัตโนมัติ
-5. **Top-Tier MCP Hub:** ลงทะเบียนครบทั้ง Neo4j (Graph), Redis (Cache), Postgres/SQLite (SQL), Puppeteer (Isolated Browser), PyWin32 (OS Native), ADHD Divergent Engine
+5. **Mandatory Playwright & Top-Tier MCP Hub:** บังคับใช้ Microsoft Playwright พร้อมลงทะเบียน Neo4j (Graph), Redis (Cache), Postgres/SQLite (SQL), PyWin32 (OS Native), ADHD Divergent Engine
 6. **Modern PEP 621 Python Standard:** รองรับ `pyproject.toml` แทน `requirements.txt` พร้อมแยก Runtime `.venv` ใน Tier 2 สมบูรณ์แบบ
 7. **Session-Level PATH Isolation:** ตัวแปร `%PATH%` ฝังเฉพาะในเซสชัน ไม่ปนเปื้อน Windows Registry ส่วนกลาง
 
 ---
 
-[⬅️ กลับสู่หน้าหลัก (Back to README)](../README.md) | [🏛️ สถาปัตยกรรมระบบ](../doc/th/01_ARCHITECTURE.md)
+[⬅️ กลับสู่หน้าหลัก (Back to README)](../README.md) | [🏛️ สถาปัตยกรรมระบบ](../doc/th/01_ARCHITECTURE.md) | [🎭 มาตรฐาน Playwright MCP](../doc/th/03_PLAYWRIGHT_MCP_SPEC.md)
