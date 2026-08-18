@@ -8,6 +8,7 @@
 ## 1. Tier 1 (AI Control Plane)
 - **ตำแหน่ง:** `tools/`, `.mcp/`, `.skills/`
 - **ขอบเขต:** สำหรับเครื่องมือของ AI Agent เท่านั้น
+- **กฎเหล็ก Host Detachment:** AI ต้องใช้ Portable Tools (`tools/git`, `tools/node`, `tools/python312`) ภายใน Tier 1 เท่านั้น **ห้ามใช้ Global Git/Node/Python ของเครื่องหลัก (Host Machine) เด็ดขาด**
 - **ข้อห้าม:** ห้ามรัน `npm install` หรือ `pip install` สำหรับโปรเจกต์ลงใน Tier 1 เด็ดขาด
 
 ---
@@ -15,7 +16,7 @@
 ## 2. Tier 2 (Project Data Plane)
 - **ตำแหน่ง:** `projects/<project_name>/runtime/`
 - **ขอบเขต:** รันไทม์เฉพาะของแต่ละโปรเจกต์
-- **การแยกส่วน:** ทุก dependencies (`node_modules`, `.venv`, CUDA DLLs) จะต้องถูกกักขังอยู่ในโฟลเดอร์ของโปรเจกต์นั้น 100%
+- **การแยกส่วน:** ทุก dependencies (`node_modules`, `.venv`, CUDA DLLs) จะต้องถูกกักขังอยู่ในโฟลเดอร์ของโปรเจกต์นั้น 100% ไม่อนุญาตให้ย้อนกลับมาปนเปื้อน Tier 1 Base
 
 ---
 
