@@ -40,6 +40,7 @@ cd HermetiCore
 - 🏛️ [01_ARCHITECTURE.md - Deep Architecture Overview](doc/en/01_ARCHITECTURE.md)
 - 🔒 [02_TWO_TIER_RULES.md - Two-Tier Hermetic Separation Standard](doc/en/02_TWO_TIER_RULES.md)
 - 🎭 [03_PLAYWRIGHT_MCP_SPEC.md - Playwright Browser MCP Specification](doc/en/03_PLAYWRIGHT_MCP_SPEC.md)
+- 🔑 [config/README.md - Credentials & Secret Management Hub (.env / SSH / Fine-Grained PAT)](config/README.md)
 
 ---
 

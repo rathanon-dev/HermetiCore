@@ -20,8 +20,14 @@
 
 ---
 
+## 3. การแยกความลับและ Credentials (Zero-Leak Policy)
+- **ตำแหน่ง:** `config/.env`, `config/id_ed25519*`
+- **ขอบเขต:** ควบคุมสิทธิ์การเข้าถึงภายนอก (GitHub MCP, Git CLI Remote)
+- **กฎเหล็ก Device-Bound:** แต่ละอุปกรณ์ (`MainPC` vs `Laptop`) ต้องใช้ Key และ Fine-Grained PAT ของตัวเอง **ห้ามคัดลอกกุญแจส่วนตัวข้ามเครื่องเด็ดขาด** (Lost Backpack Axiom)
+- **การป้องกันการรั่วไหล:** ไฟล์ `.env` และ SSH Keys ทั้งหมดถูกล็อกด้วย `.gitignore` 100% ป้องกันการ Push ขึ้นสู่ Public Repository โดยไม่ตั้งใจ (ดูรายละเอียดใน [config/README.md](../../config/README.md))
+
 ---
 
-**การนำทาง:** [🏠 หน้าหลัก](../../README.md) | [🇹🇭 ภาษาไทย](../../README.th.md) | [🇬🇧 English](../../README.en.md) | [🏛️ สถาปัตยกรรม](01_ARCHITECTURE.md) | [🎭 Playwright MCP](03_PLAYWRIGHT_MCP_SPEC.md) | [⬆️ กลับด้านบน](#top)
+**การนำทาง:** [🏠 หน้าหลัก](../../README.md) | [🇹🇭 ภาษาไทย](../../README.th.md) | [🇬🇧 English](../../README.en.md) | [🏛️ สถาปัตยกรรม](01_ARCHITECTURE.md) | [🎭 Playwright MCP](03_PLAYWRIGHT_MCP_SPEC.md) | [🔑 คู่มือจัดการความลับ](../../config/README.md) | [⬆️ กลับด้านบน](#top)
 
 **ผู้พัฒนาและดูแลโครงการ:** [@rathanon-dev](https://github.com/rathanon-dev) · **สัญญาอนุญาต:** [MIT](../../LICENSE) · [เครดิตทั้งหมด](../../README.md#-เครดิตและเครื่องมือที่อ้างอิง-credits--acknowledgements)

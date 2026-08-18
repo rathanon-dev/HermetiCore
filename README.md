@@ -91,10 +91,12 @@ HermetiCore/
   - [สถาปัตยกรรมระบบ (Architecture)](doc/th/01_ARCHITECTURE.md)
   - [กฎเหล็กการแยกขาด 2 ชั้น (Two-Tier Rules)](doc/th/02_TWO_TIER_RULES.md)
   - [มาตรฐาน Playwright Browser MCP (Autify Benchmark)](doc/th/03_PLAYWRIGHT_MCP_SPEC.md)
+  - [🔑 คู่มือจัดการความลับ & Credentials (.env / SSH / Fine-Grained PAT)](config/README.md)
 - 🇬🇧 **English (EN):**
   - [System Architecture](doc/en/01_ARCHITECTURE.md)
   - [Two-Tier Hermetic Rules](doc/en/02_TWO_TIER_RULES.md)
   - [Playwright Browser MCP Specification](doc/en/03_PLAYWRIGHT_MCP_SPEC.md)
+  - [🔑 Credentials & Secret Management Hub](config/README.md)
 
 ---
 

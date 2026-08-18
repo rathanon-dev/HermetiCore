@@ -14,6 +14,7 @@ This document continuously tracks all autonomous actions, architectural decision
 | `2026-08-19 02:33:51` | `Claude Sonnet 4.6 (Thinking)` | ADHD Audit: Auto-Delete Root `temp/`, Root `.setup-lock`, Pod `sandbox/` | `COMPLETED` | Added `projects/_template_fullstack/sandbox/` (demo_users, mock_data, temp), drain barrier on temp wipe, decoupled test runner. |
 | `2026-08-19 02:40:32` | `Claude Sonnet 4.6 (Thinking)` | Codify Model-Stamped Commit Rule & Demo User Persistence Guarantee | `COMPLETED` | Enforced `[AI: <Model Name>]` commit header, banned automatic sandbox wipes on reboot, updated `AI_BOOTSTRAP_PROTOCOL.md`. |
 | `2026-08-19 02:43:30` | `Gemini 3.7 Flash` | Complete Git Synchronization & Multi-Model State Integrity Audit | `COMPLETED` | Fully synchronized local workspace `D:\HermetiCore` with GitHub origin/main (`3dcf989`). |
+| `2026-08-19 04:55:00` | `Gemini 3.7 Flash` | ADHD Credential Hub: Hydrate `config/.env`, Fine-Grained PAT, Ed25519 SSH & Zero-Leak Docs | `COMPLETED` | Hydrated `config/.env`, created comprehensive `config/README.md`, unified multi-device (MainPC/Laptop) isolation guidelines across all docs. |
 
 ---
 

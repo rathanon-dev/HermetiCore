@@ -20,8 +20,14 @@
 
 ---
 
+## 3. Credential & Secret Isolation (Zero-Leak Policy)
+- **Location:** `config/.env`, `config/id_ed25519*`
+- **Scope:** Manages outbound authentication (GitHub MCP Server, Git CLI remotes).
+- **Device-Bound Axiom:** Every physical device (`MainPC` vs `Laptop`) MUST derive its own unique Ed25519 SSH Key and Fine-Grained PAT. **Never clone or copy private keys across devices** (The Lost Backpack Axiom).
+- **Zero-Leak Guarantee:** All `.env` files and SSH keys are 100% blocked by `.gitignore`, preventing accidental pushes to public repositories (See [config/README.md](../../config/README.md)).
+
 ---
 
-**Navigation:** [🏠 Home](../../README.md) | [🇹🇭 Thai](../../README.th.md) | [🇬🇧 English](../../README.en.md) | [🏛️ Architecture](01_ARCHITECTURE.md) | [🎭 Playwright MCP](03_PLAYWRIGHT_MCP_SPEC.md) | [⬆️ Back to Top](#top)
+**Navigation:** [🏠 Home](../../README.md) | [🇹🇭 Thai](../../README.th.md) | [🇬🇧 English](../../README.en.md) | [🏛️ Architecture](01_ARCHITECTURE.md) | [🎭 Playwright MCP](03_PLAYWRIGHT_MCP_SPEC.md) | [🔑 Credentials Hub](../../config/README.md) | [⬆️ Back to Top](#top)
 
 **Maintainer:** [@rathanon-dev](https://github.com/rathanon-dev) · **License:** [MIT](../../LICENSE) · [View All Credits](../../README.md#-credits--acknowledgements)

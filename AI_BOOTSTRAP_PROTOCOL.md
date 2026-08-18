@@ -181,3 +181,14 @@ Format log:
 2. **Tier 2 Projects** สามารถลบทิ้ง แตกไฟล์ใหม่ หรือย้ายไปเครื่องอื่นได้ทันทีโดยไม่พัง
 3. **Root `temp/`** คือ Transient Staging เท่านั้น — ถูกลบอัตโนมัติหลัง `setup.ps1` เสร็จ
 4. **`sandbox/demo_users/`** คงค่าข้ามวัน ข้าม session ข้าม reboot — ลบได้เฉพาะเมื่อ Human/AI สั่ง Explicit เท่านั้น
+
+---
+
+## 🔑 8. กฎการเข้าถึงความลับและ Credentials (Zero-Leak Ingestion Axiom)
+
+> **MANDATORY CREDENTIAL DIRECTIVE:**
+> 1. **Hydration First:** ก่อนที่ AI จะเรียกใช้ GitHub MCP Server หรือ API Tools ต้องตรวจสอบว่ามี `config/.env` หรือไม่ หากยังไม่มีให้แนะนำผู้ใช้หรือคัดลอกจาก `config/env.example`
+> 2. **Token Ingestion:** AI จะอ่าน `GITHUB_PERSONAL_ACCESS_TOKEN` จาก `config/.env` หรือ Environment Variables เท่านั้น **ห้าม Hardcode Token ลงในซอร์สโค้ดหรือ Commit Message เด็ดขาด**
+> 3. **Device-Bound Isolation:** เครื่อง MainPC และ Laptop ต้องใช้ Token และ SSH Key แยกกัน (`HermetiCore-MainPC` vs `HermetiCore-Laptop`) ห้ามซิงค์ความลับข้ามเครื่อง per ISO/IEC/IEEE 12207
+> 4. **Git Operations:** การ Push โค้ดผ่าน Git CLI จะใช้กุญแจ `config/id_ed25519` เพื่อความปลอดภัยสูงสุดแบบ Zero-Prompt (ดูคู่มือฉบับเต็มที่ [`config/README.md`](config/README.md))
+
