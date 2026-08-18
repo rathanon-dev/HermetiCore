@@ -1,0 +1,8 @@
+{
+  "_comment": "Seed chat rooms for LAN Share Chat demo. Committed to git as canonical test fixtures.",
+  "rooms": [
+    { "id": "room-general", "name": "general",  "type": "public",  "created_by": "admin-001" },
+    { "id": "room-dev",     "name": "dev-team", "type": "private", "created_by": "alice-001" },
+    { "id": "room-random",  "name": "random",   "type": "public",  "created_by": "admin-001" }
+  ]
+}
