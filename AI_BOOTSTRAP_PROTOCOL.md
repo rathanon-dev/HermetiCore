@@ -1,0 +1,57 @@
+# 🧬 AI BOOTSTRAP PROTOCOL (LABBASE-5 MASTER SPEC)
+## The Two-Tier Hermetic Separation Standard
+
+> **MANDATORY AI DIRECTIVE:** Any AI agent (Antigravity, Claude, Copilot) operating inside `LabBase-5` MUST strictly enforce the boundary between **Tier 1 (AI Control Plane)** and **Tier 2 (Project Data Plane)** without exception.
+
+---
+
+## 🏛️ 1. กฎเหล็กการแบ่งแยก 2 ชั้น (The Two-Tier Architecture Axiom)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  TIER 1: AI CONTROL PLANE (Root tools/ & .mcp/ - สำหรับ AI เท่านั้น)         │
+│                                                                             │
+│  • ความเป็นเจ้าของ: เป็นพื้นที่และเครื่องมือเฉพาะของ AI Agent               │
+│  • สิ่งที่บรรจุ: 7z, Aria2, Git, Root Node/Python สำหรับรัน MCP Servers     │
+│    (เช่น Browser MCP, SQL MCP, API/Postman MCP, Figma MCP)                  │
+│  • หน้าที่: ใช้เฉพาะช่วง "ต้นน้ำ" (Drafting, สกัด Requirement, Scaffold)   │
+│  • ⛔ กฎเหล็กข้อห้าม: ห้าม AI สั่ง npm install หรือ pip install แพ็กเกจของ    │
+│    โปรเจกต์ลงใน Tier 1 Root เด็ดขาด!                                        │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │ (AI ทำหน้าที่เป็นผู้สร้างและวางสเปก)
+┌──────────────────────────────────────▼──────────────────────────────────────┐
+│  TIER 2: PROJECT DATA PLANE (projects/<name>/runtime/ - สำหรับโปรเจกต์)      │
+│                                                                             │
+│  • ความเป็นเจ้าของ: เป็นพื้นที่รันไทม์เฉพาะของแต่ละโปรเจกต์                 │
+│  • สิ่งที่บรรจุ: Node.js, Python, node_modules, venv, CUDA DLLs ประจำงาน    │
+│  • หน้าที่: ทุกคำสั่ง `npm install`, `pip install`, `npm run dev`, `build`   │
+│    จะต้องรันผ่าน Runtime ภายในโฟลเดอร์ `projects/<name>/runtime/` เท่านั้น    │
+│  • 🔒 การแยกส่วน: โปรเจกต์ A และ B มี Runtime อิสระต่อกัน 100%             │
+│    ไม่มีการแชร์ node_modules ข้ามโปรเจกต์ และไม่ย้อนกลับไปกวน Tier 1 Base   │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📋 2. วงจรการทำงานของ AI (Lifecycle Operational Rules)
+
+### 🔹 สเต็ปที่ 1: ช่วงตั้งต้น / ร่างไอเดีย (Drafting Phase)
+- AI สามารถใช้เครื่องมือใน **Tier 1 (`tools/`)** และ MCP ต่างๆ ในการค้นหาข้อมูล, ร่างข้อกำหนดใน `specs/01_REQUIREMENTS.md`, และดึง Design Tokens จาก Figma มาใส่ใน `design/`
+
+### 🔹 สเต็ปที่ 2: ช่วงขึ้นโครงสร้างและติดตั้งโค้ด (Construction Phase)
+- เมื่อเริ่มพัฒนาโค้ดหรือติดตั้ง Dependencies (เช่น `npm install` หรือ `pip install`):
+  - **AI จะต้องสั่งงานผ่าน Runtime ในโฟลเดอร์ของโปรเจกต์นั้นเสมอ (`projects/<name>/runtime/`)**
+  - หากโปรเจกต์ใช้ Node.js: ให้โหลด Node.js พกพามาใส่ใน `projects/<name>/runtime/tools/node/`
+  - หากโปรเจกต์ใช้ Python + GPU: ให้โหลด Python + CUDA DLLs มาใส่ใน `projects/<name>/runtime/tools/nvidia/`
+  - ทุกแพ็กเกจจะถูกกักขังไว้ในโฟลเดอร์โปรเจกต์นั้น 100%
+
+### 🔹 สเต็ปที่ 3: ช่วงทดสอบและส่งมอบงาน (Verification & Gate Phase)
+- AI ทดสอบความถูกต้องใน `staging/ai/` โดยรันผ่าน Runtime เฉพาะของโปรเจกต์
+- ส่งต่อให้คนทดสอบใน `staging/human/` ผ่านไฟล์ `start_verify.bat`
+- ซิงค์โค้ดที่ผ่านการอนุมัติเข้า `repo/` เพื่อทำ Git Push
+
+---
+
+## 🛡️ 3. การันตีความปลอดภัย (Zero Contamination Guarantee)
+1. **Tier 1 Root Base** จะสะอาดและไม่เปลี่ยนสภาพตลอดไป (Immutable AI Workstation)
+2. **Tier 2 Projects** สามารถลบทิ้ง แตกไฟล์ใหม่ หรือย้ายไปเครื่องอื่นได้ทันทีโดยไม่พัง
