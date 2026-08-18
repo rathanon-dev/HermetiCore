@@ -19,13 +19,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Hydrate HermetiCore Tier 1 Toolchains
-        shell: ${{ matrix.shell }}
-        run: |
-          Write-Host ">>> Launching HermetiCore Master Setup Engine..." -ForegroundColor Cyan
-          .\setup.ps1
+        run: ${{ matrix.shell }} -File .\setup.ps1
 
       - name: Execute ADHD 6-Model Stress Test Matrix
-        shell: ${{ matrix.shell }}
-        run: |
-          Write-Host ">>> Executing ADHD Concurrency & Failure Mode Matrix..." -ForegroundColor Cyan
-          .\tests\run_adhd_test_matrix.ps1
+        run: ${{ matrix.shell }} -File .\tests\run_adhd_test_matrix.ps1
