@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json.schemastore.org/mcp-settings.json",
+  "mcpServers": {
+    "adhd-ideator": {
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "./.skills/adhd/run_ideation.ps1"
+      ],
+      "description": "ADHD Divergent Cognitive Engine (Multi-Frame Parallel Ideation & Architecture Stress-Testing)"
+    },
+    "git-mcp": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-git", "--repository", "./"],
+      "description": "Git Version Control MCP (Diff, Log, Commit, Status, Branch Inspection)"
+    },
+    "powershell-mcp": {
+      "command": "npx",
+      "args": ["-y", "powershell-mcp"],
+      "description": "Native Windows PowerShell Execution, System Monitoring & Telemetry"
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
+      "description": "Automated Browser Interaction, UI Visual Verification & E2E Testing"
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "./projects"],
+      "description": "Strict Sandbox File Access & Workspace Isolation"
+    },
+    "sqlite": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sqlite"],
+      "description": "Embedded Database Inspection & Query Engine"
+    }
+  }
+}
