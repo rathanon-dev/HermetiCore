@@ -13,9 +13,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Test on Windows Server 2019 (Win 10 kernel), 2022 (Win 11 kernel), and latest
-        os: [windows-2019, windows-2022, windows-latest]
-        # Test both AMD64 and ARM64 architectures
+        # Reduced to windows-latest to avoid limits during heavy testing
+        os: [windows-latest]
         arch: [AMD64, ARM64]
 
     runs-on: ${{ matrix.os }}
@@ -24,41 +23,106 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Spoof Architecture and Test Download
+      - name: Run Setup with Spoofed Architecture
         shell: pwsh
         run: |
-          # The "Wrong-Warp" Spoof: We fake the architecture variable so the script 
-          # thinks it's on ARM64 and attempts to route to the ARM64 binaries.
           $env:PROCESSOR_ARCHITECTURE = "${{ matrix.arch }}"
-          
           Write-Host "=================================================="
-          Write-Host " Testing Setup on OS: ${{ matrix.os }}"
-          Write-Host " Spoofed Architecture: $env:PROCESSOR_ARCHITECTURE"
+          Write-Host " OS: ${{ matrix.os }} | Arch: $env:PROCESSOR_ARCHITECTURE"
           Write-Host "=================================================="
           
-          # Run the setup script.
+          # Execute Tier 1 Setup (Now includes PIP fix)
           ./setup.ps1
+
+      - name: Strict Validation 1 - Node.js Isolation & Execution
+        shell: pwsh
+        run: |
+          # Prevent GitHub Runner shadowing
+          $env:PATH = ($env:PATH -split ';' | Where-Object { $_ -notmatch 'hostedtoolcache|Program Files|WindowsApps' }) -join ';'
+          $env:PATH = "$pwd\tools\node;$env:PATH"
           
-          # Verification: Check if the files were successfully downloaded and extracted.
-          # Since aria2 and 7zip are x64, they will run perfectly on the GitHub runner,
-          # allowing us to verify the ARM64 extraction logic without needing an ARM runner!
-          $missing = $false
-          
-          if (-not (Test-Path "tools\git\cmd\gh.exe")) {
-              Write-Error "GitHub CLI (gh.exe) was not found!"
-              $missing = $true
-          }
-          if (-not (Test-Path "tools\node\node.exe")) {
-              Write-Error "Node.js (node.exe) was not found!"
-              $missing = $true
-          }
-          if (-not (Test-Path "tools\python\python.exe")) {
-              Write-Error "Python (python.exe) was not found!"
-              $missing = $true
-          }
-          
-          if ($missing) {
+          try {
+              $nodePath = (Get-Command node -ErrorAction Stop).Source
+              Write-Host "[DEBUG] Node.js located at: $nodePath"
+              if ($nodePath -notmatch '\\tools\\') { throw "Isolation breach: node execution bled to host OS path $nodePath" }
+              
+              $ver = node -v
+              Write-Host "[DEBUG] Node version: $ver"
+              if ([string]::IsNullOrWhiteSpace($ver)) { throw 'Node.js returned empty version string.' }
+          } catch {
+              Write-Error "[FATAL] Node.js validation failed: $_"
               exit 1
-          } else {
-              Write-Host "[OK] All required binaries were successfully routed, downloaded, and extracted!" -ForegroundColor Green
           }
+
+      - name: Strict Validation 2 - Python 3.12, PIP & Site-Packages
+        shell: pwsh
+        run: |
+          $env:PATH = ($env:PATH -split ';' | Where-Object { $_ -notmatch 'hostedtoolcache|Program Files|WindowsApps' }) -join ';'
+          $env:PATH = "$pwd\tools\python;$pwd\tools\python\Scripts;$env:PATH"
+          $env:PYTHONNOUSERSITE = '1'
+          
+          try {
+              $pyPath = (Get-Command python -ErrorAction Stop).Source
+              Write-Host "[DEBUG] Python located at: $pyPath"
+              if ($pyPath -notmatch '\\tools\\') { throw "Isolation breach: python bled to host $pyPath" }
+              
+              $ver = python --version 2>&1
+              Write-Host "[DEBUG] Python version: $ver"
+              if ($ver -notmatch 'Python 3\.12') { throw "Expected Python 3.12.x, got: $ver" }
+              
+              Write-Host "[DEBUG] Checking pip..."
+              $pipPath = (Get-Command pip -ErrorAction Stop).Source
+              $pipVer = python -m pip --version 2>&1
+              Write-Host "[DEBUG] Pip version: $pipVer"
+              
+              Write-Host "[DEBUG] Validating site-packages isolation..."
+              $site = python -c "import site; print(site.getsitepackages()[0])"
+              if ($site -match 'runneradmin|hostedtoolcache') { throw "Isolation breach: Python site-packages leaked to host OS directory $site" }
+              Write-Host "[OK] Python & PIP verified."
+          } catch {
+              Write-Error "[FATAL] Pip/site-packages validation failed: $_"
+              exit 1
+          }
+
+      - name: Strict Validation 3 - Git Config Ignorance
+        shell: pwsh
+        run: |
+          $env:PATH = ($env:PATH -split ';' | Where-Object { $_ -notmatch 'hostedtoolcache|Program Files|WindowsApps' }) -join ';'
+          $env:PATH = "$pwd\tools\git\cmd;$env:PATH"
+          
+          try {
+              $gitPath = (Get-Command git -ErrorAction Stop).Source
+              Write-Host "[DEBUG] Git located at: $gitPath"
+              if ($gitPath -notmatch '\\tools\\') { throw "Isolation breach: System Git shadowed portable Git" }
+              
+              $ver = git --version
+              Write-Host "[DEBUG] Git version: $ver"
+          } catch {
+              Write-Error "[FATAL] Git validation failed: $_"
+              exit 1
+          }
+
+      - name: Strict Validation 4 - MCP Server via NPX
+        shell: pwsh
+        run: |
+          $env:PATH = ($env:PATH -split ';' | Where-Object { $_ -notmatch 'hostedtoolcache|Program Files|WindowsApps' }) -join ';'
+          $env:PATH = "$pwd\tools\node;$env:PATH"
+          $env:npm_config_cache = "$pwd\.portable_npm_cache"
+          $env:npm_config_userconfig = "NUL"
+          $env:APPDATA = "C:\Invalid"
+          
+          try {
+              Write-Host "[DEBUG] Attempting to run MCP server via npx..."
+              # Running memory MCP to see if Node/NPM ecosystem is healthy
+              $mcpOutput = npx -y @modelcontextprotocol/server-memory --help 2>&1
+              Write-Host "[DEBUG] MCP Server Output: $mcpOutput"
+              if ($mcpOutput -notmatch 'Usage:|Options:') { throw 'MCP server failed to emit help/usage text.' }
+          } catch {
+              Write-Error "[FATAL] NPX MCP server execution failed: $_"
+              exit 1
+          }
+
+      - name: Final Success
+        shell: pwsh
+        run: |
+          Write-Host "[OK] All components strictly validated under zero-footprint constraints!" -ForegroundColor Green

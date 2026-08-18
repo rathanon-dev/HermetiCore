@@ -206,9 +206,22 @@ if (-not (Test-Path $pythonExe)) {
     $pyZip = Join-Path $tempDir "python.zip"
     & $aria2Exe -x 8 -s 8 -d $tempDir -o "python.zip" (Get-DownloadUrl $pyUrl) | Out-Null
     & $7zExe x $pyZip "-o$pythonDir" -y | Out-Null
+    
+    # Enable site-packages
+    $pthFile = Get-ChildItem -Path $pythonDir -Filter "*._pth" | Select-Object -First 1
+    if ($pthFile) {
+        (Get-Content $pthFile.FullName) -replace "#import site", "import site" | Set-Content $pthFile.FullName
+    }
+    
+    # Bootstrap pip
+    Write-Host " [*] Installing PIP for Tier 1..." -ForegroundColor Cyan
+    $getPip = Join-Path $tempDir "get-pip.py"
+    & $aria2Exe -x 4 -s 4 -d $tempDir -o "get-pip.py" (Get-DownloadUrl "https://bootstrap.pypa.io/get-pip.py") | Out-Null
+    & (Join-Path $pythonDir "python.exe") $getPip
+    
     Get-ChildItem -Path $pythonDir -Filter "*.exe" -Recurse | ForEach-Object { Unblock-File $_.FullName -ErrorAction SilentlyContinue }
     Remove-Item $pyZip -Force -ErrorAction SilentlyContinue
-    Write-Host " [OK] Python 3.12 Initialized." -ForegroundColor Green
+    Write-Host " [OK] Python 3.12 Initialized (with PIP)." -ForegroundColor Green
 }
 
 # 11. ADHD-Fix: DRAIN BARRIER — Wait for child processes to release handles

@@ -75,6 +75,16 @@
         "& ./tools/python/python.exe -m mcp_pywin"
       ],
       "description": "Windows OS Native Win32 API, Window Management & Process Telemetry via Python"
+    },
+    "neurodivergent-memory": {
+      "command": "npx",
+      "args": ["-y", "neurodivergent-memory"],
+      "description": "Associative Graph Memory for Neurodivergent AI, providing persistent context across sessions"
+    },
+    "nodeterm": {
+      "command": "npx",
+      "args": ["-y", "eneskirca/nodeterm"],
+      "description": "Node-based terminal manager for running background tasks, shells, and parallel execution"
     }
   }
 }
