@@ -1,7 +1,7 @@
 <a id="top"></a>
+[🏠 หน้าหลัก (Home)](../../README.md) > [📚 เอกสารภาษาไทย (TH)] > 📄 **กฎเหล็กการแยกขาด 2 ชั้น (Two-Tier Rules)**
 
 # 🔒 กฎเหล็กการแยกขาด 2 ชั้น (Two-Tier Hermetic Separation & Scaffolding Protocols)
-[⬅️ กลับสู่หน้าหลัก (Back to README)](../../README.md) | [🇬🇧 Read in English](../en/02_TWO_TIER_RULES.md)
 
 เอกสารฉบับนี้คือ **"สมองกล (Core Logic)"** ที่บังคับใช้กับ AI Agents ทุกตัว (เช่น Antigravity, Claude, Gemini) เพื่อให้การสร้างและรันโปรเจกต์เป็นไปตามมาตรฐานการแยกส่วนอย่างเด็ดขาด (Zero-Footprint).
 
@@ -57,6 +57,6 @@
 
 ---
 
-**การนำทาง:** [🏠 หน้าหลัก](../../README.md) | [🏛️ สถาปัตยกรรม](01_ARCHITECTURE.md) | [⚖️ ข้อกำหนดเครื่องมือ](04_TOOLING_AND_LICENSES.md) | [⬆️ กลับด้านบน](#top)
+**การนำทาง (Navigation):** [🏠 หน้าหลัก (Home)](../../README.md) | [🏛️ สถาปัตยกรรม (Architecture)](01_ARCHITECTURE.md) | [🔒 กฎ 2 ชั้น (Two-Tier Rules)](02_TWO_TIER_RULES.md) | [🎭 Playwright MCP](03_PLAYWRIGHT_MCP_SPEC.md) | [📜 ข้อกำหนด (Licenses)](04_TOOLING_AND_LICENSES.md) | [⬆️ กลับด้านบน (Top)](#top)
 
-**ผู้พัฒนาและดูแลโครงการ:** [@rathanon-dev](https://github.com/rathanon-dev)
+**ผู้พัฒนาและดูแลโครงการ:** [@rathanon-dev](https://github.com/rathanon-dev) · **สัญญาอนุญาต:** [MIT](../../LICENSE)

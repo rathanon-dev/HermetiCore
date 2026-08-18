@@ -1,7 +1,7 @@
 <a id="top"></a>
+[🏠 หน้าหลัก (Home)](../../README.md) > [📚 เอกสารภาษาไทย (TH)] > 📄 **มาตรฐาน Playwright MCP (Browser Sandbox)**
 
 # 🎭 มาตรฐานสถาปัตยกรรม Playwright Browser MCP Engine
-[⬅️ กลับสู่หน้าหลัก (Back to README)](../../README.md) | [🇬🇧 Read in English](../en/03_PLAYWRIGHT_MCP_SPEC.md)
 
 ---
 
@@ -62,8 +62,6 @@
 
 ---
 
----
+**การนำทาง (Navigation):** [🏠 หน้าหลัก (Home)](../../README.md) | [🏛️ สถาปัตยกรรม (Architecture)](01_ARCHITECTURE.md) | [🔒 กฎ 2 ชั้น (Two-Tier Rules)](02_TWO_TIER_RULES.md) | [🎭 Playwright MCP](03_PLAYWRIGHT_MCP_SPEC.md) | [📜 ข้อกำหนด (Licenses)](04_TOOLING_AND_LICENSES.md) | [⬆️ กลับด้านบน (Top)](#top)
 
-**การนำทาง:** [🏠 หน้าหลัก](../../README.md) | [🇹🇭 ภาษาไทย](../../README.th.md) | [🇬🇧 English](../../README.en.md) | [🏛️ สถาปัตยกรรม](01_ARCHITECTURE.md) | [🔒 กฎ 2 ชั้น](02_TWO_TIER_RULES.md) | [⬆️ กลับด้านบน](#top)
-
-**ผู้พัฒนาและดูแลโครงการ:** [@rathanon-dev](https://github.com/rathanon-dev) · **สัญญาอนุญาต:** [MIT](../../LICENSE) · [เครดิตทั้งหมด](../../README.md#-เครดิตและเครื่องมือที่อ้างอิง-credits--acknowledgements)
+**ผู้พัฒนาและดูแลโครงการ:** [@rathanon-dev](https://github.com/rathanon-dev) · **สัญญาอนุญาต:** [MIT](../../LICENSE)

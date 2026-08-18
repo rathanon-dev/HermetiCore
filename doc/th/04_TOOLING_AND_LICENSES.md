@@ -1,3 +1,6 @@
+<a id="top"></a>
+[🏠 หน้าหลัก (Home)](../../README.md) > [📚 เอกสารภาษาไทย (TH)] > 📄 **สถาปัตยกรรมเครื่องมือและข้อกำหนดสิทธิ์ (Tooling & Licenses)**
+
 # 📜 สถาปัตยกรรมเครื่องมือและข้อกำหนดสิทธิ์ (Tooling Pipeline & Licenses)
 
 เอกสารนี้อธิบายสถาปัตยกรรม "การดึงเครื่องมือ (Bootstrapping)" ของโปรเจกต์ HermetiCore อย่างละเอียด เพื่อให้เกิดความโปร่งใสในด้านข้อกำหนดสิทธิ์ (Licenses) และแสดงให้เห็นถึงความสามารถของระบบที่สามารถประกอบร่างตัวเองได้แบบ 100% Zero-Footprint.
@@ -56,4 +59,8 @@
 2. เราไม่มีการทำซ้ำ (Reproduce) หรือแจกจ่าย (Distribute) ทรัพย์สินทางปัญญาของ Third-Party ใดๆ
 3. ผู้ใช้งาน (End-User) จะเป็นผู้เชื่อมต่ออินเทอร์เน็ตและดาวน์โหลดไฟล์เหล่านั้นมาที่เครื่องตนเองตามสิทธิ์การใช้งานของแพลตฟอร์มต้นทาง 100%
 
-> 📝 **จัดทำโดย:** *@rathanon-dev*
+---
+
+**การนำทาง (Navigation):** [🏠 หน้าหลัก (Home)](../../README.md) | [🏛️ สถาปัตยกรรม (Architecture)](01_ARCHITECTURE.md) | [🔒 กฎ 2 ชั้น (Two-Tier Rules)](02_TWO_TIER_RULES.md) | [🎭 Playwright MCP](03_PLAYWRIGHT_MCP_SPEC.md) | [📜 ข้อกำหนด (Licenses)](04_TOOLING_AND_LICENSES.md) | [⬆️ กลับด้านบน (Top)](#top)
+
+**ผู้พัฒนาและดูแลโครงการ:** [@rathanon-dev](https://github.com/rathanon-dev) · **สัญญาอนุญาต:** [MIT](../../LICENSE)
