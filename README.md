@@ -98,6 +98,7 @@ HermetiCore/
   - [สถาปัตยกรรมระบบ (Architecture)](doc/th/01_ARCHITECTURE.md)
   - [กฎเหล็กการแยกขาด 2 ชั้น (Two-Tier Rules)](doc/th/02_TWO_TIER_RULES.md)
   - [มาตรฐาน Playwright Browser MCP (Autify Benchmark)](doc/th/03_PLAYWRIGHT_MCP_SPEC.md)
+  - [สถาปัตยกรรมเครื่องมือและข้อกำหนดสิทธิ์ (Tooling Pipeline & Licenses)](doc/th/04_TOOLING_AND_LICENSES.md)
   - [🔑 คู่มือจัดการความลับ & Credentials (.env / SSH / Fine-Grained PAT)](config/README.md)
 - 🇬🇧 **English (EN):**
   - [System Architecture](doc/en/01_ARCHITECTURE.md)
@@ -118,6 +119,12 @@ HermetiCore/
 | [PEP 621](https://peps.python.org/pep-0621/) | Python Software Foundation | มาตรฐาน `pyproject.toml` สำหรับ Python Project Metadata |
 | [Sigstore / Rekor](https://www.sigstore.dev/) | Linux Foundation | ระบบ Supply Chain Security & Commit Attestation |
 | [Autify Engineering Blog](https://autify.com/blog/playwright-vs-puppeteer) | Autify | แหล่งอ้างอิงเปรียบเทียบ Playwright vs Puppeteer |
+| [7-Zip (CommandLine)](https://www.7-zip.org/) | Igor Pavlov | Core Unzipper ประจำระบบ (ดึงผ่าน NuGet) |
+| [Aria2](https://github.com/aria2/aria2) | Tatsuhiro Tsujikawa | Multi-connection Downloader ประจำระบบ |
+| [MinGit & GitHub CLI](https://github.com/git-for-windows/git) | Git for Windows | Version Control แบบพกพาไร้การติดตั้ง |
+| [Node.js](https://nodejs.org/) | OpenJS Foundation | Web & MCP Engine Runtime |
+| [Python 3.12](https://www.python.org/) | Python Software Foundation | AI & Data Science Runtime (ดึงผ่าน NuGet) |
+| [NVIDIA CUDA & cuDNN](https://developer.nvidia.com/) | NVIDIA Corporation | Zero-Footprint GPU Acceleration DLLs |
 
 > **หมายเหตุทางกฎหมาย:** โปรเจกต์นี้เผยแพร่ภายใต้ [MIT License](LICENSE) แบบ Open Source "AS IS" ไม่มีการรับประกันเชิงพาณิชย์ใดๆ
 > การอ้างอิง ISO/IEC/IEEE 12207:2017 เป็น **Self-Assessed Alignment** ตามมาตรฐาน ISO/IEC 17050-1 ไม่ใช่การรับรองโดยองค์กร ISO โดยตรง

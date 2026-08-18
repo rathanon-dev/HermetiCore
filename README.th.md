@@ -44,6 +44,7 @@ cd HermetiCore
 - 🏛️ [01_ARCHITECTURE.md - ภาพรวมสถาปัตยกรรมระบบ](doc/th/01_ARCHITECTURE.md)
 - 🔒 [02_TWO_TIER_RULES.md - กฎเหล็กการแยกขาด 2 ชั้น](doc/th/02_TWO_TIER_RULES.md)
 - 🎭 [03_PLAYWRIGHT_MCP_SPEC.md - มาตรฐาน Playwright Browser MCP](doc/th/03_PLAYWRIGHT_MCP_SPEC.md)
+- 📜 [04_TOOLING_AND_LICENSES.md - สถาปัตยกรรมเครื่องมือและข้อกำหนดสิทธิ์](doc/th/04_TOOLING_AND_LICENSES.md)
 - 🔑 [config/README.md - คู่มือจัดการความลับ & Credentials (.env / SSH / Fine-Grained PAT)](config/README.md)
 
 ---
