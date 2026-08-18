@@ -226,21 +226,26 @@ if (-not (Test-Path $sshKeyPath)) {
     $localSsh = Join-Path $gitDir "usr\bin\ssh-keygen.exe"
     if (Test-Path $localSsh) { $sshKeygen = $localSsh }
     
-    & $sshKeygen -t ed25519 -C "hermeticore-ai@workstation" -f $sshKeyPath -N '""' | Out-Null
+    $keygenArgs = @("-t", "ed25519", "-C", "hermeticore-ai@workstation", "-f", $sshKeyPath, "-N", "")
+    & $sshKeygen $keygenArgs 2>&1 | Out-Null
     if (Test-Path $sshPubPath) {
         $pubContent = (Get-Content $sshPubPath -Raw).Trim()
-        Write-Host "`n 🔑 =================== HERMETICORE SSH PUBLIC KEY ===================" -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host " [KEY] ================= HERMETICORE SSH PUBLIC KEY =================" -ForegroundColor Yellow
         Write-Host " $pubContent" -ForegroundColor White
-        Write-Host " 👉 Add to GitHub: https://github.com/settings/ssh/new" -ForegroundColor Cyan
-        Write-Host " =====================================================================`n" -ForegroundColor Yellow
+        Write-Host " [KEY] Add to GitHub: https://github.com/settings/ssh/new" -ForegroundColor Cyan
+        Write-Host " ===================================================================" -ForegroundColor Yellow
+        Write-Host ""
     }
 }
 
 # 13. Release root lockfile
 if (Test-Path $lockFile) { Remove-Item $lockFile -Force -ErrorAction SilentlyContinue }
 
-Write-Host "`n ======================================================================" -ForegroundColor Green
+Write-Host ""
+Write-Host " ======================================================================" -ForegroundColor Green
 Write-Host " [SUCCESS] HermetiCore Spore Hydration Finished!" -ForegroundColor Green
 Write-Host " All Tier 1 Tools, MCPs, Skills, and Logs are 100% Active." -ForegroundColor Cyan
 Write-Host " ======================================================================" -ForegroundColor Green
+
 
