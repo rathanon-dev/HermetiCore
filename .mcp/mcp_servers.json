@@ -17,6 +17,14 @@
       "args": ["-y", "@modelcontextprotocol/server-git", "--repository", "./"],
       "description": "Git Version Control MCP (Diff, Log, Commit, Status, Branch Inspection)"
     },
+    "github-mcp": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
+      },
+      "description": "Official GitHub Platform MCP (Search Repos, Manage Issues, Create Pull Requests, Trigger Actions)"
+    },
     "powershell-mcp": {
       "command": "npx",
       "args": ["-y", "powershell-mcp"],

@@ -1,6 +1,7 @@
 # ======================================================================
-# METABASE AI (LABBASE-5) GIT IGNORE SPECIFICATION
+# HERMETICORE GIT IGNORE SPECIFICATION
 # Keep the upstream repository ultra-lightweight (< 100 KB)
+# Standard: ISO/IEC/IEEE 12207 Zero-Contamination Standard
 # ======================================================================
 
 # Ephemeral Tools & Runtime Binaries (Auto-downloaded by setup.ps1)
@@ -41,8 +42,16 @@ projects/**/runtime/.env.local
 # Playwright browser driver cache (Tier 1 — ephemeral)
 tools/playwright-browsers/
 
-# Sensitive Configs & Local Overrides
+# Sensitive Configs, SSH Keys & Local Overrides
+config/.env
+config/.env.*
 config/*.key
+config/id_ed25519*
+config/id_rsa*
 config/local_secrets.json
 .env
 .env.local
+.env.*.local
+!config/env.example
+!config/README.md
+

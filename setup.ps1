@@ -207,10 +207,40 @@ if (Test-Path $tempDir) {
     }
 }
 
-# 12. Release root lockfile
+# 12. Security & Credentials Auto-Provisioning (Tier 1 Config)
+$sshKeyPath = Join-Path $configDir "id_ed25519"
+$sshPubPath = Join-Path $configDir "id_ed25519.pub"
+$envFile    = Join-Path $configDir ".env"
+$envExample = Join-Path $configDir "env.example"
+
+# Auto-hydrate config/.env from template if missing
+if ((-not (Test-Path $envFile)) -and (Test-Path $envExample)) {
+    Copy-Item $envExample $envFile -Force
+    Write-Host " [INFO] Initialized config/.env from template." -ForegroundColor DarkCyan
+}
+
+# Auto-generate Ed25519 SSH Keypair for Zero-Prompt Git Operations
+if (-not (Test-Path $sshKeyPath)) {
+    Write-Host " [*] Provisioning isolated Ed25519 SSH Keypair in config/..." -ForegroundColor Cyan
+    $sshKeygen = "ssh-keygen"
+    $localSsh = Join-Path $gitDir "usr\bin\ssh-keygen.exe"
+    if (Test-Path $localSsh) { $sshKeygen = $localSsh }
+    
+    & $sshKeygen -t ed25519 -C "hermeticore-ai@workstation" -f $sshKeyPath -N '""' | Out-Null
+    if (Test-Path $sshPubPath) {
+        $pubContent = (Get-Content $sshPubPath -Raw).Trim()
+        Write-Host "`n 🔑 =================== HERMETICORE SSH PUBLIC KEY ===================" -ForegroundColor Yellow
+        Write-Host " $pubContent" -ForegroundColor White
+        Write-Host " 👉 Add to GitHub: https://github.com/settings/ssh/new" -ForegroundColor Cyan
+        Write-Host " =====================================================================`n" -ForegroundColor Yellow
+    }
+}
+
+# 13. Release root lockfile
 if (Test-Path $lockFile) { Remove-Item $lockFile -Force -ErrorAction SilentlyContinue }
 
 Write-Host "`n ======================================================================" -ForegroundColor Green
 Write-Host " [SUCCESS] HermetiCore Spore Hydration Finished!" -ForegroundColor Green
 Write-Host " All Tier 1 Tools, MCPs, Skills, and Logs are 100% Active." -ForegroundColor Cyan
 Write-Host " ======================================================================" -ForegroundColor Green
+
