@@ -37,6 +37,13 @@ $pythonExe     = Join-Path $pythonDir "python.exe"
 
 # 2. Prevent race conditions from multiple parallel double-clicks
 if (-not (Test-Path $tempDir)) { New-Item -ItemType Directory -Path $tempDir -Force | Out-Null }
+if (-not (Test-Path $toolsDir)) { New-Item -ItemType Directory -Path $toolsDir -Force | Out-Null }
+if (-not (Test-Path $7zDir)) { New-Item -ItemType Directory -Path $7zDir -Force | Out-Null }
+if (-not (Test-Path $aria2Dir)) { New-Item -ItemType Directory -Path $aria2Dir -Force | Out-Null }
+if (-not (Test-Path $gitDir)) { New-Item -ItemType Directory -Path $gitDir -Force | Out-Null }
+if (-not (Test-Path $nodeDir)) { New-Item -ItemType Directory -Path $nodeDir -Force | Out-Null }
+if (-not (Test-Path $pythonDir)) { New-Item -ItemType Directory -Path $pythonDir -Force | Out-Null }
+
 if (Test-Path $lockFile) {
     $existingPid = Get-Content $lockFile -ErrorAction SilentlyContinue
     if ($existingPid -and (Get-Process -Id $existingPid -ErrorAction SilentlyContinue)) {
@@ -111,8 +118,8 @@ if (-not (Test-Path $aria2Exe)) {
     & $7zExe x $ariaZip "-o$tempDir\aria_tmp" -y | Out-Null
     $extractedAria = Get-ChildItem "$tempDir\aria_tmp" -Filter "aria2c.exe" -Recurse | Select-Object -First 1
     if ($extractedAria) { 
-        Copy-Item $extractedAria.FullName $ariaExe -Force 
-        Unblock-File -Path $ariaExe -ErrorAction SilentlyContinue
+        Copy-Item $extractedAria.FullName $aria2Exe -Force 
+        Unblock-File -Path $aria2Exe -ErrorAction SilentlyContinue
     }
     Remove-Item "$tempDir\aria_tmp" -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item $ariaZip -Force -ErrorAction SilentlyContinue
