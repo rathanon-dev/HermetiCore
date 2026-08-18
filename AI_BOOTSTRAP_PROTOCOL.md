@@ -12,8 +12,8 @@
 │  TIER 1: AI CONTROL PLANE (Root tools/ & .mcp/ - สำหรับ AI เท่านั้น)         │
 │                                                                             │
 │  • ความเป็นเจ้าของ: เป็นพื้นที่และเครื่องมือเฉพาะของ AI Agent               │
-│  • สิ่งที่บรรจุ: 7z, Aria2, Git, Root Node/Python สำหรับรัน MCP Servers     │
-│    (เช่น Browser MCP, SQL MCP, API/Postman MCP, Figma MCP)                  │
+│  • สิ่งที่บรรจุ: 7z, Aria2, Git, Node LTS, Python 3.12, MCP Hub             │
+│    (Neo4j, Redis, Postgres, SQLite, Puppeteer Browser Driver, PyWin32)      │
 │  • หน้าที่: ใช้เฉพาะช่วง "ต้นน้ำ" (Drafting, สกัด Requirement, Scaffold)   │
 │  • ⛔ กฎเหล็กข้อห้าม: ห้าม AI สั่ง npm install หรือ pip install แพ็กเกจของ    │
 │    โปรเจกต์ลงใน Tier 1 Root เด็ดขาด!                                        │
@@ -23,7 +23,8 @@
 │  TIER 2: PROJECT DATA PLANE (projects/<name>/runtime/ - สำหรับโปรเจกต์)      │
 │                                                                             │
 │  • ความเป็นเจ้าของ: เป็นพื้นที่รันไทม์เฉพาะของแต่ละโปรเจกต์                 │
-│  • สิ่งที่บรรจุ: Node.js, Python, node_modules, venv, CUDA DLLs ประจำงาน    │
+│  • สิ่งที่บรรจุ: Node.js, Python, node_modules, .venv, CUDA DLLs ประจำงาน   │
+│  • มาตรฐาน Python ยุคใหม่: ใช้ pyproject.toml (PEP 621) ห้ามใช้ text ล้วน    │
 │  • หน้าที่: ทุกคำสั่ง `npm install`, `pip install`, `npm run dev`, `build`   │
 │    จะต้องรันผ่าน Runtime ภายในโฟลเดอร์ `projects/<name>/runtime/` เท่านั้น    │
 │  • 🔒 การแยกส่วน: โปรเจกต์ A และ B มี Runtime อิสระต่อกัน 100%             │
@@ -33,10 +34,26 @@
 
 ---
 
-## 📋 2. วงจรการทำงานของ AI (Lifecycle Operational Rules)
+## 🎯 2. เสาหลัก 3 เฟรมเวิร์ก (The 3 Framework Pillars)
+
+1. **PowerShell Engine (Windows Automation Backbone):**
+   - รองรับทั้ง **PowerShell 5.1 (Desktop)** ในตัว Windows และ **PowerShell 7.x (Core)**
+   - ทำงานแบบ Bare-Metal Zero-Admin Scripting
+
+2. **Node.js LTS Engine (Web & MCP Ecosystem):**
+   - พัฒนาเว็บด้วย Next.js, React, Tailwind, TypeScript
+   - รัน MCP Servers และเชื่อมต่อ OmniProxy LAN Cache อัตโนมัติ
+
+3. **Modern Python 3.12 Engine (AI & Data Science):**
+   - บังคับใช้มาตรฐาน **`pyproject.toml` (PEP 517/518/621)** เสมอ (เทียบเท่า `package.json` ของ Node)
+   - รองรับ PyTorch, CUDA Dynamic DLLs, FastAPI, และ ComfyUI
+
+---
+
+## 📋 3. วงจรการทำงานของ AI (Lifecycle Operational Rules)
 
 ### 🔹 สเต็ปที่ 1: ช่วงตั้งต้น / ร่างไอเดีย (Drafting Phase)
-- AI สามารถใช้เครื่องมือใน **Tier 1 (`tools/`)** และ MCP ต่างๆ ในการค้นหาข้อมูล, ร่างข้อกำหนดใน `specs/01_REQUIREMENTS.md`, และดึง Design Tokens จาก Figma มาใส่ใน `design/`
+- AI สามารถใช้เครื่องมือใน **Tier 1 (`tools/`)** และ MCP ต่างๆ (Neo4j Graph, Redis, SQLite, Puppeteer Driver) ในการค้นหาข้อมูล, ร่างข้อกำหนดใน `specs/01_REQUIREMENTS.md`, และดึง Design Tokens จาก Figma มาใส่ใน `design/`
 
 ### 🔹 สเต็ปที่ 2: ช่วงขึ้นโครงสร้างและติดตั้งโค้ด (Construction Phase)
 - เมื่อเริ่มพัฒนาโค้ดหรือติดตั้ง Dependencies (เช่น `npm install` หรือ `pip install`):
@@ -52,6 +69,12 @@
 
 ---
 
-## 🛡️ 3. การันตีความปลอดภัย (Zero Contamination Guarantee)
+## 📜 4. ข้อกำหนดการบันทึก Audit Log อย่างต่อเนื่อง (Continuous Multi-Agent Logging)
+
+> **MANDATORY LOGGING RULE:** ทุกครั้งที่ AI Agent ทำการปรับปรุงโค้ด, รัน Stress-Test, หรือเปลี่ยนผ่านสเตจสำคัญ **จะต้องเพิ่มประวัติ (Append Log)** เข้าไปในไฟล์ **[`logs/AI_MULTI_AGENT_LOG.md`](file:///D:/MetaBase-AI/logs/AI_MULTI_AGENT_LOG.md)** เสมอ เพื่อให้ Human Architect สามารถตรวจสอบย้อนหลังได้ทุกขั้นตอน
+
+---
+
+## 🛡️ 5. การันตีความปลอดภัย (Zero Contamination Guarantee)
 1. **Tier 1 Root Base** จะสะอาดและไม่เปลี่ยนสภาพตลอดไป (Immutable AI Workstation)
 2. **Tier 2 Projects** สามารถลบทิ้ง แตกไฟล์ใหม่ หรือย้ายไปเครื่องอื่นได้ทันทีโดยไม่พัง

@@ -20,12 +20,16 @@
     "powershell-mcp": {
       "command": "npx",
       "args": ["-y", "powershell-mcp"],
-      "description": "Native Windows PowerShell Execution, System Monitoring & Telemetry"
+      "description": "Native Windows PowerShell 5.1 & 7.x Execution, System Monitoring & Telemetry"
     },
-    "chrome-devtools": {
+    "browser-puppeteer": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-puppeteer"],
-      "description": "Automated Browser Interaction, UI Visual Verification & E2E Testing"
+      "env": {
+        "PUPPETEER_CACHE_DIR": "./temp/puppeteer_cache",
+        "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "false"
+      },
+      "description": "Isolated Headless Browser Automation, UI Visual Verification, E2E Testing & Proxy Spoofing"
     },
     "filesystem": {
       "command": "npx",
@@ -35,7 +39,33 @@
     "sqlite": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-sqlite"],
-      "description": "Embedded Database Inspection & Query Engine"
+      "description": "Embedded Relational Database Inspection & SQL Query Engine"
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "description": "Enterprise PostgreSQL Database Integration & Schema Discovery"
+    },
+    "neo4j": {
+      "command": "npx",
+      "args": ["-y", "mcp-neo4j-cypher"],
+      "description": "Neo4j Graph Database & Knowledge Graph Query Engine (NoSQL Graph Standard)"
+    },
+    "redis": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-redis"],
+      "description": "In-Memory High-Speed Cache, Key-Value & Message Queue Engine (NoSQL Fast-Store)"
+    },
+    "pywin": {
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        "& ./tools/python/python.exe -m mcp_pywin"
+      ],
+      "description": "Windows OS Native Win32 API, Window Management & Process Telemetry via Python"
     }
   }
 }
