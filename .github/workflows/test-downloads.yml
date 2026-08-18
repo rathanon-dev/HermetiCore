@@ -1,0 +1,64 @@
+name: Test Setup Downloads
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test-downloads:
+    name: Test on ${{ matrix.os }} (${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        # Test on Windows Server 2019 (Win 10 kernel), 2022 (Win 11 kernel), and latest
+        os: [windows-2019, windows-2022, windows-latest]
+        # Test both AMD64 and ARM64 architectures
+        arch: [AMD64, ARM64]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Spoof Architecture and Test Download
+        shell: pwsh
+        run: |
+          # The "Wrong-Warp" Spoof: We fake the architecture variable so the script 
+          # thinks it's on ARM64 and attempts to route to the ARM64 binaries.
+          $env:PROCESSOR_ARCHITECTURE = "${{ matrix.arch }}"
+          
+          Write-Host "=================================================="
+          Write-Host " Testing Setup on OS: ${{ matrix.os }}"
+          Write-Host " Spoofed Architecture: $env:PROCESSOR_ARCHITECTURE"
+          Write-Host "=================================================="
+          
+          # Run the setup script.
+          ./setup.ps1
+          
+          # Verification: Check if the files were successfully downloaded and extracted.
+          # Since aria2 and 7zip are x64, they will run perfectly on the GitHub runner,
+          # allowing us to verify the ARM64 extraction logic without needing an ARM runner!
+          $missing = $false
+          
+          if (-not (Test-Path "tools\git\cmd\gh.exe")) {
+              Write-Error "GitHub CLI (gh.exe) was not found!"
+              $missing = $true
+          }
+          if (-not (Test-Path "tools\node\node.exe")) {
+              Write-Error "Node.js (node.exe) was not found!"
+              $missing = $true
+          }
+          if (-not (Test-Path "tools\python\python.exe")) {
+              Write-Error "Python (python.exe) was not found!"
+              $missing = $true
+          }
+          
+          if ($missing) {
+              exit 1
+          } else {
+              Write-Host "[OK] All required binaries were successfully routed, downloaded, and extracted!" -ForegroundColor Green
+          }

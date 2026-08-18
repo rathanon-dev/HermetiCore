@@ -160,7 +160,8 @@ if (-not (Test-Path $gitExe)) {
 if (-not (Test-Path $ghExe)) {
     Write-Host " [*] [3.5/5] Fetching GitHub CLI (gh) Portable..." -ForegroundColor Cyan
     Ensure-TempDir
-    $ghUrl = "https://github.com/cli/cli/releases/download/v2.97.0/gh_2.97.0_windows_amd64.zip"
+    $ghArch = if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") { "arm64" } else { "amd64" }
+    $ghUrl = "https://github.com/cli/cli/releases/download/v2.97.0/gh_2.97.0_windows_${ghArch}.zip"
     $ghZip = Join-Path $tempDir "gh.zip"
     & $aria2Exe -x 8 -s 8 -d $tempDir -o "gh.zip" (Get-DownloadUrl $ghUrl) | Out-Null
     & $7zExe x $ghZip "-o$tempDir\gh_tmp" -y | Out-Null
@@ -181,7 +182,8 @@ if (-not (Test-Path $ghExe)) {
 if (-not (Test-Path $nodeExe)) {
     Write-Host " [*] [4/5] Fetching Node.js LTS Portable..." -ForegroundColor Cyan
     Ensure-TempDir
-    $nodeUrl = "https://nodejs.org/dist/v20.17.0/node-v20.17.0-win-x64.zip"
+    $nodeArch = if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") { "arm64" } else { "x64" }
+    $nodeUrl = "https://nodejs.org/dist/v20.17.0/node-v20.17.0-win-${nodeArch}.zip"
     $nodeZip = Join-Path $tempDir "node.zip"
     & $aria2Exe -x 8 -s 8 -d $tempDir -o "node.zip" (Get-DownloadUrl $nodeUrl) | Out-Null
     & $7zExe x $nodeZip "-o$tempDir\node_tmp" -y | Out-Null
@@ -199,7 +201,8 @@ if (-not (Test-Path $nodeExe)) {
 if (-not (Test-Path $pythonExe)) {
     Write-Host " [*] [5/5] Fetching Python 3.12 Embedded..." -ForegroundColor Cyan
     Ensure-TempDir
-    $pyUrl = "https://www.python.org/ftp/python/3.12.5/python-3.12.5-embed-amd64.zip"
+    $pyArch = if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") { "arm64" } else { "amd64" }
+    $pyUrl = "https://www.python.org/ftp/python/3.12.5/python-3.12.5-embed-${pyArch}.zip"
     $pyZip = Join-Path $tempDir "python.zip"
     & $aria2Exe -x 8 -s 8 -d $tempDir -o "python.zip" (Get-DownloadUrl $pyUrl) | Out-Null
     & $7zExe x $pyZip "-o$pythonDir" -y | Out-Null
