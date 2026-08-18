@@ -1,0 +1,28 @@
+name: HermetiCore Windows CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  windows-matrix-test:
+    runs-on: windows-latest
+    name: Windows Bare-Metal & ADHD Concurrency Test
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Hydrate HermetiCore Tier 1 Toolchains
+        shell: pwsh
+        run: |
+          Write-Host ">>> Launching HermetiCore Master Setup Engine..." -ForegroundColor Cyan
+          .\setup.ps1
+
+      - name: Execute ADHD 6-Model Stress Test Matrix
+        shell: pwsh
+        run: |
+          Write-Host ">>> Executing ADHD Concurrency & Failure Mode Matrix..." -ForegroundColor Cyan
+          .\tests\run_adhd_test_matrix.ps1
