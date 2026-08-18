@@ -1,7 +1,7 @@
 # 🧬 AI BOOTSTRAP PROTOCOL (LABBASE-5 MASTER SPEC)
 ## The Two-Tier Hermetic Separation Standard
 
-> **MANDATORY AI DIRECTIVE:** Any AI agent (Antigravity, Claude, Copilot) operating inside `LabBase-5` MUST strictly enforce the boundary between **Tier 1 (AI Control Plane)** and **Tier 2 (Project Data Plane)** without exception.
+> **MANDATORY AI DIRECTIVE:** Any AI agent (Antigravity, Claude, Copilot, Gemini) operating inside `LabBase-5` MUST read this file FIRST before taking any action. All rules below are non-negotiable.
 
 ---
 
@@ -13,7 +13,7 @@
 │                                                                             │
 │  • ความเป็นเจ้าของ: เป็นพื้นที่และเครื่องมือเฉพาะของ AI Agent               │
 │  • สิ่งที่บรรจุ: 7z, Aria2, Git, Node LTS, Python 3.12, MCP Hub             │
-│    (Neo4j, Redis, Postgres, SQLite, Puppeteer Browser Driver, PyWin32)      │
+│    (Neo4j, Redis, Postgres, SQLite, Playwright Browser, PyWin32)            │
 │  • หน้าที่: ใช้เฉพาะช่วง "ต้นน้ำ" (Drafting, สกัด Requirement, Scaffold)   │
 │  • ⛔ กฎเหล็กข้อห้าม: ห้าม AI สั่ง npm install หรือ pip install แพ็กเกจของ    │
 │    โปรเจกต์ลงใน Tier 1 Root เด็ดขาด!                                        │
@@ -34,7 +34,57 @@
 
 ---
 
-## 🎯 2. เสาหลัก 3 เฟรมเวิร์ก (The 3 Framework Pillars)
+## 🤖 2. กฎเหล็ก Model-Stamped Git Commit (บังคับทุก AI ทุกโมเดล)
+
+> **MANDATORY COMMIT IDENTITY RULE:** ทุก AI Agent ที่ commit code ลง repository นี้ **ต้องระบุชื่อโมเดล AI ของตัวเองอย่างชัดเจน** ทั้งใน `git config user.name` และในหัว commit message เสมอ
+
+### 📐 รูปแบบ Commit มาตรฐาน
+
+```bash
+# Step 1: ตั้งค่า identity ให้ตรงกับโมเดลที่กำลังใช้งาน
+git config user.name  "<AI Model Name>"
+git config user.email "ai-<model-slug>@metabase.local"
+
+# Step 2: Commit พร้อม Model Tag ในหัว message เสมอ
+git commit -m "[AI: <Model Name>] <type>(<scope>): <description>"
+```
+
+### 🏷️ ตัวอย่าง Format ตามโมเดล
+
+| โมเดลที่ใช้ | `user.name` | `user.email` | Prefix ใน message |
+|---|---|---|---|
+| Claude Sonnet 4.6 (Thinking) | `Claude Sonnet 4.6` | `ai-claude-s4@metabase.local` | `[AI: Claude Sonnet 4.6 (Thinking)]` |
+| Claude Opus 4 | `Claude Opus 4` | `ai-claude-opus4@metabase.local` | `[AI: Claude Opus 4]` |
+| Gemini 3.7 Flash | `Gemini 3.7 Flash` | `ai-gemini-37f@metabase.local` | `[AI: Gemini 3.7 Flash]` |
+| Gemini 3.1 Pro | `Gemini 3.1 Pro` | `ai-gemini-31p@metabase.local` | `[AI: Gemini 3.1 Pro]` |
+| GitHub Copilot | `GitHub Copilot` | `ai-copilot@metabase.local` | `[AI: GitHub Copilot]` |
+
+### ✅ ตัวอย่าง Commit ที่ถูกต้อง
+
+```bash
+[AI: Claude Sonnet 4.6 (Thinking)] fix(arch): auto-delete root temp/, move lockfile to .setup-lock
+[AI: Gemini 3.7 Flash] feat(mcp): add Neo4j and Redis to MCP fleet
+[AI: Claude Opus 4] refactor(services): migrate api-backend to pyproject.toml PEP 621
+```
+
+### ❌ Commit ที่ไม่ได้รับอนุญาต (REJECTED)
+
+```bash
+fix: some changes           ← ไม่มี [AI: ...] prefix
+Gemini AI: update stuff     ← ไม่ตรง format
+feat: add feature           ← ไม่ระบุโมเดล
+```
+
+### 🎯 ประโยชน์ของระบบนี้
+
+1. **Blame by Model:** `git log --grep="Claude Sonnet"` → เห็นทันทีว่าโมเดลไหนแก้อะไร
+2. **Bug Attribution:** ถ้าโค้ดพัง ดู commit tag รู้ทันทีว่าโมเดลไหนก่อปัญหา
+3. **Model Capability Audit:** ถ้าสลับโมเดลแล้วแก้ผ่าน → รู้ว่าปัญหานี้ต้องใช้โมเดลไหน
+4. **Multi-Agent History:** ถ้าทำงานหลายโมเดลพร้อมกัน ประวัติไม่ปน
+
+---
+
+## 🎯 3. เสาหลัก 3 เฟรมเวิร์ก (The 3 Framework Pillars)
 
 1. **PowerShell Engine (Windows Automation Backbone):**
    - รองรับทั้ง **PowerShell 5.1 (Desktop)** ในตัว Windows และ **PowerShell 7.x (Core)**
@@ -50,17 +100,49 @@
 
 ---
 
-## 📋 3. วงจรการทำงานของ AI (Lifecycle Operational Rules)
+## 🧪 4. กฎเหล็ก Sandbox & Demo User Management
+
+> **MANDATORY SANDBOX RULE:** `sandbox/` ภายใน Project Pod คือ ephemeral test zone ที่มีกฎการจัดการที่ชัดเจน
+
+### 📁 โครงสร้าง Sandbox ที่ถูกต้อง
+
+```text
+projects/<name>/sandbox/
+├── demo_users/          # Playwright isolated userDataDir — ข้ามเซสชันได้, คงค่าข้ามวัน
+│   ├── user_alice/      # Cookie, LocalStorage, IndexedDB ของ Alice
+│   └── user_bob/        # Cookie, LocalStorage, IndexedDB ของ Bob
+├── mock_data/           # Static seed data — ✅ committed to git
+│   ├── seed_users.json
+│   └── seed_chat_rooms.json
+└── temp/                # Runtime trash — ❌ gitignored, ลบเมื่อเริ่ม test run ใหม่
+```
+
+### 🔒 กฎการจัดการ Sandbox
+
+| โฟลเดอร์ | ลบเมื่อ Reboot? | ลบเมื่อ? | Committed to Git? |
+|---|---|---|---|
+| `demo_users/` | ❌ **ห้ามลบ** | เมื่อ AI หรือ User สั่งลบเท่านั้น | ❌ (gitignored profiles) |
+| `mock_data/` | ❌ ห้ามลบ | ไม่มีวันลบ — เป็น canonical seed | ✅ committed |
+| `temp/` | ❌ ไม่ลบอัตโนมัติตอน reboot | ลบตอนเริ่ม test run ใหม่เท่านั้น | ❌ gitignored |
+
+### ⛔ สิ่งที่ห้ามทำ
+
+- ❌ ห้าม symlink `sandbox/temp/` → `%TEMP%` (ข้อมูลหายเมื่อ reboot ระหว่างพัฒนา)
+- ❌ ห้ามลบ `demo_users/` อัตโนมัติโดยไม่มีคำสั่งจาก Human หรือ AI ที่ได้รับอนุมัติ
+- ✅ ลบ `temp/` ได้ตอนเริ่ม test run ใหม่ (ไม่ใช่ตอน shutdown)
+
+---
+
+## 📋 5. วงจรการทำงานของ AI (Lifecycle Operational Rules)
 
 ### 🔹 สเต็ปที่ 1: ช่วงตั้งต้น / ร่างไอเดีย (Drafting Phase)
-- AI สามารถใช้เครื่องมือใน **Tier 1 (`tools/`)** และ MCP ต่างๆ (Neo4j Graph, Redis, SQLite, Puppeteer Driver) ในการค้นหาข้อมูล, ร่างข้อกำหนดใน `specs/01_REQUIREMENTS.md`, และดึง Design Tokens จาก Figma มาใส่ใน `design/`
+- AI สามารถใช้เครื่องมือใน **Tier 1 (`tools/`)** และ MCP ต่างๆ ในการค้นหาข้อมูล, ร่างข้อกำหนดใน `specs/01_REQUIREMENTS.md`, และดึง Design Tokens จาก Figma มาใส่ใน `design/`
 
 ### 🔹 สเต็ปที่ 2: ช่วงขึ้นโครงสร้างและติดตั้งโค้ด (Construction Phase)
 - เมื่อเริ่มพัฒนาโค้ดหรือติดตั้ง Dependencies (เช่น `npm install` หรือ `pip install`):
   - **AI จะต้องสั่งงานผ่าน Runtime ในโฟลเดอร์ของโปรเจกต์นั้นเสมอ (`projects/<name>/runtime/`)**
   - หากโปรเจกต์ใช้ Node.js: ให้โหลด Node.js พกพามาใส่ใน `projects/<name>/runtime/tools/node/`
   - หากโปรเจกต์ใช้ Python + GPU: ให้โหลด Python + CUDA DLLs มาใส่ใน `projects/<name>/runtime/tools/nvidia/`
-  - ทุกแพ็กเกจจะถูกกักขังไว้ในโฟลเดอร์โปรเจกต์นั้น 100%
 
 ### 🔹 สเต็ปที่ 3: ช่วงทดสอบและส่งมอบงาน (Verification & Gate Phase)
 - AI ทดสอบความถูกต้องใน `staging/ai/` โดยรันผ่าน Runtime เฉพาะของโปรเจกต์
@@ -69,12 +151,20 @@
 
 ---
 
-## 📜 4. ข้อกำหนดการบันทึก Audit Log อย่างต่อเนื่อง (Continuous Multi-Agent Logging)
+## 📜 6. ข้อกำหนดการบันทึก Audit Log อย่างต่อเนื่อง (Continuous Multi-Agent Logging)
 
-> **MANDATORY LOGGING RULE:** ทุกครั้งที่ AI Agent ทำการปรับปรุงโค้ด, รัน Stress-Test, หรือเปลี่ยนผ่านสเตจสำคัญ **จะต้องเพิ่มประวัติ (Append Log)** เข้าไปในไฟล์ **[`logs/AI_MULTI_AGENT_LOG.md`](file:///D:/MetaBase-AI/logs/AI_MULTI_AGENT_LOG.md)** เสมอ เพื่อให้ Human Architect สามารถตรวจสอบย้อนหลังได้ทุกขั้นตอน
+> **MANDATORY LOGGING RULE:** ทุกครั้งที่ AI Agent ทำการปรับปรุงโค้ด, รัน Stress-Test, หรือเปลี่ยนผ่านสเตจสำคัญ **จะต้องเพิ่มประวัติ (Append Log)** เข้าไปในไฟล์ **[`logs/AI_MULTI_AGENT_LOG.md`](logs/AI_MULTI_AGENT_LOG.md)** เสมอ
+
+Format log:
+```markdown
+| `YYYY-MM-DD HH:MM:SS` | `<AI Model Name>` | <Action Description> | `COMPLETED` | <Notes> |
+```
 
 ---
 
-## 🛡️ 5. การันตีความปลอดภัย (Zero Contamination Guarantee)
+## 🛡️ 7. การันตีความปลอดภัย (Zero Contamination Guarantee)
+
 1. **Tier 1 Root Base** จะสะอาดและไม่เปลี่ยนสภาพตลอดไป (Immutable AI Workstation)
 2. **Tier 2 Projects** สามารถลบทิ้ง แตกไฟล์ใหม่ หรือย้ายไปเครื่องอื่นได้ทันทีโดยไม่พัง
+3. **Root `temp/`** คือ Transient Staging เท่านั้น — ถูกลบอัตโนมัติหลัง `setup.ps1` เสร็จ
+4. **`sandbox/demo_users/`** คงค่าข้ามวัน ข้าม session ข้าม reboot — ลบได้เฉพาะเมื่อ Human/AI สั่ง Explicit เท่านั้น
