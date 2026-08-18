@@ -31,6 +31,9 @@ cd HermetiCore
 .\start.bat
 ```
 
+### 🔑 Credentials & Personal Access Token Setup
+See quick guide at [**`config/README.md`**](config/README.md) to configure your GitHub Personal Access Token (`.env`) and Ed25519 SSH Key.
+
 ### 🤖 Prompt your AI Agent
 > *"Read and execute the rules in `AI_BOOTSTRAP_PROTOCOL.md` in this directory."*
 

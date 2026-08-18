@@ -13,7 +13,7 @@
 
 ---
 
-**[🇹🇭 ภาษาไทย (TH)](README.th.md)** | **[🇬🇧 English (EN)](README.en.md)** | **[🏛️ สถาปัตยกรรมระบบ](doc/th/01_ARCHITECTURE.md)** | **[🔒 กฎเหล็ก 2 ชั้น](doc/th/02_TWO_TIER_RULES.md)** | **[🎭 มาตรฐาน Playwright MCP](doc/th/03_PLAYWRIGHT_MCP_SPEC.md)**
+**[🇹🇭 ภาษาไทย (TH)](README.th.md)** | **[🇬🇧 English (EN)](README.en.md)** | **[🔑 ตั้งค่าความลับ (.env / SSH / Token)](config/README.md)** | **[🏛️ สถาปัตยกรรม](doc/th/01_ARCHITECTURE.md)** | **[🔒 กฎเหล็ก 2 ชั้น](doc/th/02_TWO_TIER_RULES.md)** | **[🎭 Playwright MCP](doc/th/03_PLAYWRIGHT_MCP_SPEC.md)**
 
 </div>
 
@@ -23,6 +23,7 @@
 
 - ⚡ **1-Click Self-Assembly:** โคลนโปรเจกต์ขนาดเพียง **~95 KB** แล้วดับเบิ้ลคลิก `start.bat` ระบบจะประกอบร่าง Toolchains ทั้งหมดให้ใน 10 วินาที
 - 🔒 **Two-Tier Hermetic Separation:** แบ่งแยก **Tier 1 (เครื่องมือ AI / MCP / Skills)** ออกจาก **Tier 2 (ซอร์สโค้ด / Runtime / .venv)** เด็ดขาด 100%
+- 🔑 **Zero-Leak Credentials Hub:** ระบบจัดการความลับแยกขาดประจำเครื่อง (`config/.env` และ `id_ed25519`) ปลอดภัยจากการ Push สู่สาธารณะ 100%
 - 🎭 **Mandatory Microsoft Playwright MCP:** ควบคุมเบราว์เซอร์อัตโนมัติด้วย Playwright แยก Context ไร้การรั่วไหลของคุกกี้ และรองรับ Proxy LAN
 - 🚀 **LAN Acceleration Aware:** ตรวจจับ **OmniProxy LAN Gateway** (`192.168.1.10:8080`) อัตโนมัติ ดาวน์โหลดและติดตั้งความเร็วระดับ LAN
 - 🧠 **Embedded ADHD Divergent Engine:** ฝังระบบระดมความคิดและทดสอบสถาปัตยกรรมแบบคู่ขนาน 5 มิติ
@@ -54,6 +55,10 @@ cd HermetiCore
 .\start.bat
 ```
 
+### 🔑 การตั้งค่ากุญแจและความลับ (Credentials & Access Token)
+> ดูวิธีใส่ GitHub Token และ SSH Key ฉบับย่อได้ที่: [**`config/README.md (คู่มือจัดการความลับ)`**](config/README.md)
+> * คัดลอก `config/env.example` เป็น `config/.env` แล้วใส่ `GITHUB_PERSONAL_ACCESS_TOKEN`
+
 ### 🤖 สั่งงาน AI Agent
 ส่งคำสั่งนี้ให้ AI (Antigravity / Claude / Copilot):
 > *"อ่านและปฏิบัติตามกฎใน `AI_BOOTSTRAP_PROTOCOL.md` ในโฟลเดอร์นี้ เพื่อเริ่มพัฒนาโปรเจกต์"*
@@ -76,7 +81,9 @@ HermetiCore/
 ├── .skills/adhd/             # 🧠 [AI Cognitive] ADHD Divergent Ideation Engine
 ├── .mcp/                     # 🔌 [AI Tools] Playwright, Neo4j, Redis, SQLite, Git, Shell
 ├── logs/                     # 📋 [Logs] AI_MULTI_AGENT_LOG.md & ADHD_STRESS_TEST_REPORT.md
-├── config/                   # 🔑 [Config] SSH Keys & OmniProxy settings
+├── config/                   # 🔑 [Config] ศูนย์รวมการตั้งค่า & ความลับ (Zero-Leak)
+│   ├── env.example           # 📄 แม่แบบ Environment & Token (ก๊อปปี้ไปเป็น .env)
+│   └── README.md             # 📖 คู่มือตั้งค่า SSH Key & Fine-Grained PAT
 ├── doc/                      # 📚 [Docs] คู่มือฉบับเต็มภาษาไทย (doc/th) และอังกฤษ (doc/en)
 │
 └── projects/                 # 📦 [Tier 2] พื้นที่พัฒนาโปรเจกต์ (แยก Runtime อิสระ)
