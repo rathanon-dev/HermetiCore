@@ -35,6 +35,12 @@
 
 ---
 
-[⬅️ กลับสู่หน้าหลัก (README.md)](README.md) | [🇬🇧 English Documentation](README.en.md)
+## 🙏 เครดิตและเครื่องมือที่อ้างอิง
 
-*จัดทำโดย: [@rathanon-dev](https://github.com/rathanon-dev)*
+ดูรายละเอียดเต็มได้ที่ [หน้าหลัก README.md](README.md#-เครดิตและเครื่องมือที่อ้างอิง-credits--acknowledgements)
+
+---
+
+[🏠 หน้าหลัก (Home)](README.md) | [🇬🇧 English](README.en.md) | [⬆️ กลับด้านบน](#top)
+
+**ผู้พัฒนาและดูแลโครงการ:** [@rathanon-dev](https://github.com/rathanon-dev) · **สัญญาอนุญาต:** [MIT](LICENSE)

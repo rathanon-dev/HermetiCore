@@ -19,4 +19,8 @@
 
 ---
 
-[⬅️ Back to Main README](../../README.md) | [🏛️ System Architecture](01_ARCHITECTURE.md) | [⬆️ Back to Top](#top)
+---
+
+**Navigation:** [🏠 Home](../../README.md) | [🇹🇭 Thai](../../README.th.md) | [🇬🇧 English](../../README.en.md) | [🏛️ Architecture](01_ARCHITECTURE.md) | [🎭 Playwright MCP](03_PLAYWRIGHT_MCP_SPEC.md) | [⬆️ Back to Top](#top)
+
+**Maintainer:** [@rathanon-dev](https://github.com/rathanon-dev) · **License:** [MIT](../../LICENSE) · [View All Credits](../../README.md#-credits--acknowledgements)

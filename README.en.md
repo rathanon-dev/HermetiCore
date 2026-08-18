@@ -35,6 +35,12 @@ Welcome to **MetaBase-AI**, the universal, zero-footprint, self-assembling devel
 
 ---
 
-[⬅️ Back to Main README](README.md) | [🇹🇭 อ่านฉบับภาษาไทย (Thai Manual)](README.th.md)
+## 🙏 Credits & Acknowledgements
 
-*Maintained by: [@rathanon-dev](https://github.com/rathanon-dev)*
+Full credits table available at [Main README.md](README.md#-credits--acknowledgements)
+
+---
+
+[🏠 Home](README.md) | [🇹🇭 Thai](README.th.md) | [⬆️ Back to Top](#top)
+
+**Maintainer:** [@rathanon-dev](https://github.com/rathanon-dev) · **License:** [MIT](LICENSE)

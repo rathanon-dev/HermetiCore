@@ -23,4 +23,8 @@ The system cleanly separates architectural concerns:
 
 ---
 
-[⬅️ Back to Main README](../../README.md) | [🔒 Two-Tier Rules](02_TWO_TIER_RULES.md) | [⬆️ Back to Top](#top)
+---
+
+**Navigation:** [🏠 Home](../../README.md) | [🇹🇭 Thai](../../README.th.md) | [🇬🇧 English](../../README.en.md) | [🔒 Two-Tier Rules](02_TWO_TIER_RULES.md) | [🎭 Playwright MCP](03_PLAYWRIGHT_MCP_SPEC.md) | [⬆️ Back to Top](#top)
+
+**Maintainer:** [@rathanon-dev](https://github.com/rathanon-dev) · **License:** [MIT](../../LICENSE) · [View All Credits](../../README.md#-credits--acknowledgements)

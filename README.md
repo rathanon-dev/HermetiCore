@@ -86,6 +86,23 @@ MetaBase-AI/
 
 ---
 
+## 🙏 เครดิตและเครื่องมือที่อ้างอิง (Credits & Acknowledgements)
+
+| เครื่องมือ / มาตรฐาน | ผู้สร้าง | บทบาทในโปรเจกต์ |
+|---|---|---|
+| [ADHD Divergent Ideation Skill](https://github.com/UditAkhourii/adhd) | Udit Akhourii | ระบบระดมความคิดแบบคู่ขนาน 5 มิติ (`.skills/adhd/`) |
+| [Playwright MCP Server](https://github.com/executeautomation/playwright-mcp) | ExecuteAutomation | Browser Engine สำหรับ AI (`@executeautomation/playwright-mcp-server`) |
+| [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) | Anthropic | Open Standard สำหรับเชื่อม AI Agent กับ Tools & Services |
+| [ISO/IEC/IEEE 12207:2017](https://www.iso.org/standard/63712.html) | ISO / IEC / IEEE | มาตรฐานวงจรชีวิตซอฟต์แวร์ *(Self-Declared Conformity per ISO/IEC 17050-1)* |
+| [PEP 621](https://peps.python.org/pep-0621/) | Python Software Foundation | มาตรฐาน `pyproject.toml` สำหรับ Python Project Metadata |
+| [Sigstore / Rekor](https://www.sigstore.dev/) | Linux Foundation | ระบบ Supply Chain Security & Commit Attestation |
+| [Autify Engineering Blog](https://autify.com/blog/playwright-vs-puppeteer) | Autify | แหล่งอ้างอิงเปรียบเทียบ Playwright vs Puppeteer |
+
+> **หมายเหตุทางกฎหมาย:** โปรเจกต์นี้เผยแพร่ภายใต้ [MIT License](LICENSE) แบบ Open Source "AS IS" ไม่มีการรับประกันเชิงพาณิชย์ใดๆ
+> การอ้างอิง ISO/IEC/IEEE 12207:2017 เป็น **Self-Assessed Alignment** ตามมาตรฐาน ISO/IEC 17050-1 ไม่ใช่การรับรองโดยองค์กร ISO โดยตรง
+
+---
+
 [🏠 หน้าหลัก (Home)](README.md) | [🇹🇭 ภาษาไทย (TH)](README.th.md) | [🇬🇧 English (EN)](README.en.md) | [⬆️ กลับขึ้นด้านบน (Back to Top)](#top)
 
-*ผู้พัฒนาและดูแลโครงการ: [@rathanon-dev](https://github.com/rathanon-dev)*
+**ผู้พัฒนาและดูแลโครงการ:** [@rathanon-dev](https://github.com/rathanon-dev) · **สัญญาอนุญาต:** [MIT](LICENSE)

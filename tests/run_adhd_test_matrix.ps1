@@ -1,9 +1,14 @@
 # ======================================================================
 # METABASE AI - ADHD AUTOMATED MULTI-SCENARIO STRESS-TEST SUITE
 # ======================================================================
+
+$scriptDir = $PSScriptRoot
+if (-not $scriptDir) { $scriptDir = (Get-Location).Path }
+$defaultTargetDir = (Resolve-Path "$scriptDir\..").Path
+
 param(
-    [string]$TargetDir = "D:\MetaBase-AI",
-    [string]$ReportPath = "D:\MetaBase-AI\logs\ADHD_STRESS_TEST_REPORT.md"
+    [string]$TargetDir = $defaultTargetDir,
+    [string]$ReportPath = "$defaultTargetDir\logs\ADHD_STRESS_TEST_REPORT.md"
 )
 
 $ErrorActionPreference = "Continue"
