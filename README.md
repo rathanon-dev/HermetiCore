@@ -77,7 +77,7 @@ HermetiCore/
 ├── README.en.md              # 📄 หน้าหลักภาษาอังกฤษ (EN)
 ├── PROJECTS_MAP.md           # 🗺️ ดัชนีสรุปโครงการทั้งหมด
 │
-├── tools/                    # 🛠️ [Tier 1] คลังรันไทม์พกพา (7z, Aria2, Git, Node, Python)
+├── tools/                    # 🛠️ [Tier 1] คลังรันไทม์พกพา (7z, Aria2, Git, gh, Node, Python)
 ├── .skills/adhd/             # 🧠 [AI Cognitive] ADHD Divergent Ideation Engine
 ├── .mcp/                     # 🔌 [AI Tools] Playwright, Neo4j, Redis, SQLite, Git, Shell
 ├── logs/                     # 📋 [Logs] AI_MULTI_AGENT_LOG.md & ADHD_STRESS_TEST_REPORT.md

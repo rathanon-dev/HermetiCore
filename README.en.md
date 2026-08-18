@@ -8,7 +8,7 @@ Welcome to **HermetiCore**, the universal, zero-footprint, self-assembling devel
 
 1. **Tier 1 (AI Control Plane):**
    - Dedicated exclusively to AI Agent tooling (`tools/`, `.mcp/`, `.skills/`).
-   - Houses portable runtimes (Git, Node LTS, Python 3.12, 7z, Aria2) and MCP servers.
+   - Houses portable runtimes (Git, gh, Node LTS, Python 3.12, 7z, Aria2) and MCP servers.
    - Negative constraint: Never install project dependencies into Tier 1.
 2. **Tier 2 (Project Data Plane):**
    - Located at `projects/<project_name>/runtime/`.

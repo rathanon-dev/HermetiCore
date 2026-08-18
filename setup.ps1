@@ -38,6 +38,7 @@ $aria2Dir      = Join-Path $toolsDir "aria2"
 $aria2Exe      = Join-Path $aria2Dir "aria2c.exe"
 $gitDir        = Join-Path $toolsDir "git"
 $gitExe        = Join-Path $gitDir "cmd\git.exe"
+$ghExe         = Join-Path $gitDir "cmd\gh.exe"
 $nodeDir       = Join-Path $toolsDir "node"
 $nodeExe       = Join-Path $nodeDir "node.exe"
 $pythonDir     = Join-Path $toolsDir "python"
@@ -153,6 +154,27 @@ if (-not (Test-Path $gitExe)) {
     Get-ChildItem -Path $gitDir -Filter "*.exe" -Recurse | ForEach-Object { Unblock-File $_.FullName -ErrorAction SilentlyContinue }
     Remove-Item $gitZip -Force -ErrorAction SilentlyContinue
     Write-Host " [OK] MinGit Initialized." -ForegroundColor Green
+}
+
+# 8.5. Bootstrap GitHub CLI (gh) Portable (ADHD Zero-Footprint Injection)
+if (-not (Test-Path $ghExe)) {
+    Write-Host " [*] [3.5/5] Fetching GitHub CLI (gh) Portable..." -ForegroundColor Cyan
+    Ensure-TempDir
+    $ghUrl = "https://github.com/cli/cli/releases/download/v2.97.0/gh_2.97.0_windows_amd64.zip"
+    $ghZip = Join-Path $tempDir "gh.zip"
+    & $aria2Exe -x 8 -s 8 -d $tempDir -o "gh.zip" (Get-DownloadUrl $ghUrl) | Out-Null
+    & $7zExe x $ghZip "-o$tempDir\gh_tmp" -y | Out-Null
+    
+    # Locate gh.exe inside the extracted subfolder and move it to MinGit's cmd folder
+    $extractedGh = Get-ChildItem -Path "$tempDir\gh_tmp" -Filter "gh.exe" -Recurse | Select-Object -First 1
+    if ($extractedGh) {
+        Move-Item $extractedGh.FullName $ghExe -Force
+        Unblock-File $ghExe -ErrorAction SilentlyContinue
+    }
+    
+    Remove-Item "$tempDir\gh_tmp" -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item $ghZip -Force -ErrorAction SilentlyContinue
+    Write-Host " [OK] GitHub CLI Initialized (Piggybacked on MinGit)." -ForegroundColor Green
 }
 
 # 9. Bootstrap Node.js LTS

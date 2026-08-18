@@ -59,17 +59,19 @@ Reset-CleanState
 $sw = [System.Diagnostics.Stopwatch]::StartNew()
 $proc = Start-Process powershell -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$TargetDir\setup.ps1`" -AutoBootstrap" -Wait -PassThru -NoNewWindow
 $sw.Stop()
+$elapsed = $sw.Elapsed.TotalSeconds
 
 $has7z = Test-Path "$TargetDir\tools\7zip\7za.exe"
 $hasAria = Test-Path "$TargetDir\tools\aria2\aria2c.exe"
 $hasGit = Test-Path "$TargetDir\tools\git\cmd\git.exe"
+$hasGh = Test-Path "$TargetDir\tools\git\cmd\gh.exe"
 $hasNode = Test-Path "$TargetDir\tools\node\node.exe"
 $hasPy = Test-Path "$TargetDir\tools\python\python.exe"
 
-if ($proc.ExitCode -eq 0 -and $has7z -and $hasAria -and $hasGit -and $hasNode -and $hasPy) {
-    Add-TestResult "Cold Boot" "setup.ps1 -AutoBootstrap" "PASS" $sw.Elapsed.TotalSeconds "All 5 tools successfully hydrated and unblocked"
+if ($proc.ExitCode -eq 0 -and $has7z -and $hasAria -and $hasGit -and $hasGh -and $hasNode -and $hasPy) {
+    Add-TestResult "Cold Boot" "setup.ps1 Complete Fetch" "PASS" $elapsed "All Tier 1 toolchains (7z, aria2, git, gh, node, py) hydrated"
 } else {
-    Add-TestResult "Cold Boot" "setup.ps1 -AutoBootstrap" "FAIL" $sw.Elapsed.TotalSeconds "Missing tools or non-zero exit code: $($proc.ExitCode)"
+    Add-TestResult "Cold Boot" "setup.ps1 Complete Fetch" "FAIL" $elapsed "Missing one or more toolchains or non-zero exit code: $($proc.ExitCode)"
 }
 
 # 1.2 Validate Batch Files Syntax & Path Configurations
