@@ -197,31 +197,35 @@ if (-not (Test-Path $nodeExe)) {
     Write-Host " [OK] Node.js LTS Initialized." -ForegroundColor Green
 }
 
-# 10. Bootstrap Python 3.12 Embedded
+# 10. Bootstrap Python 3.12 Portable (via NuGet)
 if (-not (Test-Path $pythonExe)) {
-    Write-Host " [*] [5/5] Fetching Python 3.12 Embedded..." -ForegroundColor Cyan
+    Write-Host " [*] [5/5] Fetching Python 3.12 (NuGet Portable)..." -ForegroundColor Cyan
     Ensure-TempDir
-    $pyArch = if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") { "arm64" } else { "amd64" }
-    $pyUrl = "https://www.python.org/ftp/python/3.12.5/python-3.12.5-embed-${pyArch}.zip"
-    $pyZip = Join-Path $tempDir "python.zip"
-    & $aria2Exe -x 8 -s 8 -d $tempDir -o "python.zip" (Get-DownloadUrl $pyUrl) | Out-Null
-    & $7zExe x $pyZip "-o$pythonDir" -y | Out-Null
+    $pyPkgId = if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") { "pythonarm64" } else { "python" }
+    $pyVer = "3.12.5"
+    $pyUrl = "https://api.nuget.org/v3-flatcontainer/$pyPkgId/$pyVer/$pyPkgId.$pyVer.nupkg"
+    $pyNupkg = Join-Path $tempDir "python.nupkg"
     
-    # Enable site-packages
-    $pthFile = Get-ChildItem -Path $pythonDir -Filter "*._pth" | Select-Object -First 1
-    if ($pthFile) {
-        (Get-Content $pthFile.FullName) -replace "#import site", "import site" | Set-Content $pthFile.FullName
+    # Download NuGet package
+    & $aria2Exe -x 8 -s 8 -d $tempDir -o "python.nupkg" (Get-DownloadUrl $pyUrl) | Out-Null
+    
+    # Extract
+    $tempExtractDir = Join-Path $tempDir "py_extract"
+    if (Test-Path $tempExtractDir) { Remove-Item $tempExtractDir -Recurse -Force }
+    New-Item -ItemType Directory -Path $tempExtractDir -Force | Out-Null
+    
+    & $7zExe x $pyNupkg "-o$tempExtractDir" -y -bsp0 -bso0 | Out-Null
+    
+    # Move 'tools' contents to target
+    $sourceTools = Join-Path $tempExtractDir "tools"
+    if (Test-Path $sourceTools) {
+        Copy-Item -Path "$sourceTools\*" -Destination $pythonDir -Recurse -Force
     }
     
-    # Bootstrap pip
-    Write-Host " [*] Installing PIP for Tier 1..." -ForegroundColor Cyan
-    $getPip = Join-Path $tempDir "get-pip.py"
-    & $aria2Exe -x 4 -s 4 -d $tempDir -o "get-pip.py" (Get-DownloadUrl "https://bootstrap.pypa.io/get-pip.py") | Out-Null
-    & (Join-Path $pythonDir "python.exe") $getPip
-    
     Get-ChildItem -Path $pythonDir -Filter "*.exe" -Recurse | ForEach-Object { Unblock-File $_.FullName -ErrorAction SilentlyContinue }
-    Remove-Item $pyZip -Force -ErrorAction SilentlyContinue
-    Write-Host " [OK] Python 3.12 Initialized (with PIP)." -ForegroundColor Green
+    Remove-Item $pyNupkg -Force -ErrorAction SilentlyContinue
+    Remove-Item $tempExtractDir -Recurse -Force -ErrorAction SilentlyContinue
+    Write-Host " [OK] Python 3.12 Initialized (Native Portable via NuGet)." -ForegroundColor Green
 }
 
 # 11. ADHD-Fix: DRAIN BARRIER — Wait for child processes to release handles
