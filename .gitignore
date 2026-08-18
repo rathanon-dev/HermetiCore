@@ -1,0 +1,34 @@
+# ======================================================================
+# METABASE AI (LABBASE-5) GIT IGNORE SPECIFICATION
+# Keep the upstream repository ultra-lightweight (< 100 KB)
+# ======================================================================
+
+# Ephemeral Tools & Runtime Binaries (Auto-downloaded by setup.ps1)
+tools/
+temp/
+*.zip
+*.7z
+*.tar.gz
+
+# Node.js & Python dependencies
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# System & Session Logs
+logs/*.jsonl
+logs/*.log
+!logs/AI_MULTI_AGENT_LOG.md
+
+# Active Project Workspaces (Only keep the _template_fullstack)
+projects/*
+!projects/_template_fullstack/
+
+# Sensitive Configs & Local Overrides
+config/*.key
+config/local_secrets.json
+.env
+.env.local
