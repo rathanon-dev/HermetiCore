@@ -5,7 +5,7 @@
 
 ---
 
-## 📌 บทนำ: ทำไม MetaBase-AI จึง "บังคับใช้ Playwright เท่านั้น"
+## 📌 บทนำ: ทำไม HermetiCore จึง "บังคับใช้ Playwright เท่านั้น"
 
 ในการพัฒนา AI Workstation ยุคใหม่ AI Agent จำเป็นต้องมี **"ดวงตาและมือ"** สำหรับการทดสอบ Web UI, รัน E2E Testing, ตรวจสอบ Visual Regression, และทำ Web Scraping ความเร็วสูง
 
@@ -21,12 +21,12 @@
 | **Multi-Context Sandbox** | ✅ `browser.newContext()` สร้าง Session แยก Cookie/Storage ใน **< 5ms** | ⚠️ ต้องเปิด Browser Instance ใหม่ (ช้าและกิน RAM สูง) | จำลอง User หลายคน (เช่น LAN Share Chat) โดย Cookie ไม่ตีกัน |
 | **Browser Engine Support** | ✅ **Chromium, Firefox, WebKit (Safari)** | ⚠️ เน้นเฉพาะ Chromium (Firefox เป็น Experimental) | ทดสอบความเข้ากันได้ข้ามเบราว์เซอร์ได้สมบูรณ์ |
 | **Network Mocking & Proxy** | ✅ ดักจับ Route, Mock API Response, และสลับ Proxy ราย Context ได้ | ⚠️ จำกัดเฉพาะระดับ Browser Process ทั้งตัว | จำลองการต่อเน็ตผ่าน OmniProxy LAN (`192.168.1.10:8080`) ได้อิสระ |
-| **Multi-Language SDK** | ✅ TypeScript/Node.js, Python, C#, Java | ❌ JavaScript/Node.js เป็นหลัก (Python เป็น unofficial) | รองรับทั้งเสาหลัก Node.js และ Python ของ MetaBase-AI |
+| **Multi-Language SDK** | ✅ TypeScript/Node.js, Python, C#, Java | ❌ JavaScript/Node.js เป็นหลัก (Python เป็น unofficial) | รองรับทั้งเสาหลัก Node.js และ Python ของ HermetiCore |
 | **Anti-Bot & Human Emulation** | ✅ จำลองการเคลื่อนไหวเมาส์, การพิมพ์, และ Event เสมือนมนุษย์ | ⚠️ ตรวจจับบอทได้ง่ายกว่าเนื่องจากยึด CDP เดิม | ลดโอกาสถูกบล็อกเมื่อ AI ดึงข้อมูลหรือเทสต์เว็บ |
 
 ---
 
-## 🏛️ สถาปัตยกรรม Zero-Pollution Playwright MCP ใน MetaBase-AI
+## 🏛️ สถาปัตยกรรม Zero-Pollution Playwright MCP ใน HermetiCore
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -56,7 +56,7 @@
 
 ## 🔒 กฎเหล็กความปลอดภัยของเบราว์เซอร์ (Strict Isolation Rules)
 
-1. **ห้ามแตะเบราว์เซอร์ส่วนตัวของ User:** Playwright จะถูกสั่งให้เก็บไดรเวอร์และโปรไฟล์ไว้ใน `tools/playwright-browsers/` และ `temp/` ภายใน MetaBase-AI เท่านั้น
+1. **ห้ามแตะเบราว์เซอร์ส่วนตัวของ User:** Playwright จะถูกสั่งให้เก็บไดรเวอร์และโปรไฟล์ไว้ใน `tools/playwright-browsers/` และ `temp/` ภายใน HermetiCore เท่านั้น
 2. **ห้ามแชร์ Cookie ระหว่างการทดสอบ:** ทุกการทดสอบจะต้องรันภายใต้ `BrowserContext` ใหม่เสมอ เพื่อป้องกันปัญหา Session ตีกัน
 3. **รองรับ OmniProxy LAN Caching:** เมื่อตรวจพบ LAN Gateway (`192.168.1.10:8080`) ทราฟฟิกจะถูกส่งผ่านแคชความเร็วสูงเพื่อประหยัดแบนด์วิดท์
 

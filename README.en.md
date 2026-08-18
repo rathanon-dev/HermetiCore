@@ -1,6 +1,6 @@
-# 🇬🇧 MetaBase-AI (LabBase-5) - English Manual
+# 🇬🇧 HermetiCore - English Manual
 
-Welcome to **MetaBase-AI**, the universal, zero-footprint, self-assembling developer environment designed for autonomous AI agents.
+Welcome to **HermetiCore**, the universal, zero-footprint, self-assembling developer environment designed for autonomous AI agents.
 
 ---
 

@@ -30,6 +30,6 @@ sandbox/
 
 2. **`temp/` hygiene:** This is the project's own trash can.
    - ✅ Gitignored via `projects/**/sandbox/temp/`
-   - ✅ **Root `D:\MetaBase-AI\temp\` is SEPARATE** — for bootstrap downloads only, auto-deleted.
+   - ✅ **Root `D:\HermetiCore\temp\` is SEPARATE** — for bootstrap downloads only, auto-deleted.
 
 3. **`mock_data/` is static:** JSON seed files ARE committed to git — they are the canonical demo dataset.

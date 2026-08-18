@@ -5,7 +5,7 @@
 
 ---
 
-## 📌 Executive Summary: Why MetaBase-AI Mandates Playwright
+## 📌 Executive Summary: Why HermetiCore Mandates Playwright
 
 In an autonomous AI workstation, AI Agents require robust "eyes and hands" to execute visual UI inspection, automated E2E testing, visual regression analysis, and resilient data extraction.
 
@@ -21,7 +21,7 @@ Based on industry benchmarks and the comprehensive analysis by **Autify ([Playwr
 | **Multi-Context Sandbox** | ✅ `browser.newContext()` creates isolated sessions in **< 5ms** | ⚠️ Must spawn heavy browser processes | Test multi-user apps (e.g. LAN Share Chat) with zero cookie collisions. |
 | **Engine Compatibility** | ✅ **Chromium, Firefox, WebKit (Safari)** | ⚠️ Primary focus on Chromium | Full cross-engine visual verification. |
 | **Network & Proxy Routing** | ✅ Granular per-context proxy & route mocking | ⚠️ Global process-level proxy only | Enables seamless OmniProxy LAN (`192.168.1.10:8080`) routing. |
-| **Multi-Language SDK** | ✅ TypeScript/Node.js, Python, C#, Java | ❌ JavaScript/Node.js focused | Unified SDK across all MetaBase-AI pillars. |
+| **Multi-Language SDK** | ✅ TypeScript/Node.js, Python, C#, Java | ❌ JavaScript/Node.js focused | Unified SDK across all HermetiCore pillars. |
 
 ---
 

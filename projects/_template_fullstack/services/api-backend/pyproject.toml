@@ -5,12 +5,12 @@ build-backend = "hatchling.build"
 [project]
 name = "api-backend"
 version = "0.1.0"
-description = "High-performance modular FastAPI backend under MetaBase-AI Tier 2 Architecture"
+description = "High-performance modular FastAPI backend under HermetiCore Tier 2 Architecture"
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "MIT" }
 authors = [
-    { name = "Lead Architect", email = "architect@metabase-ai.local" }
+    { name = "Lead Architect", email = "architect@HermetiCore.local" }
 ]
 dependencies = [
     "fastapi>=0.115.0",

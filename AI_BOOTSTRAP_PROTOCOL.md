@@ -1,7 +1,7 @@
-# 🧬 AI BOOTSTRAP PROTOCOL (LABBASE-5 MASTER SPEC)
+# 🧬 AI BOOTSTRAP PROTOCOL (HermetiCore MASTER SPEC)
 ## The Two-Tier Hermetic Separation Standard
 
-> **MANDATORY AI DIRECTIVE:** Any AI agent (Antigravity, Claude, Copilot, Gemini) operating inside `LabBase-5` MUST read this file FIRST before taking any action. All rules below are non-negotiable.
+> **MANDATORY AI DIRECTIVE:** Any AI agent (Antigravity, Claude, Copilot, Gemini) operating inside `HermetiCore` MUST read this file FIRST before taking any action. All rules below are non-negotiable.
 
 ---
 

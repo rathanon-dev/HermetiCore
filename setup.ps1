@@ -1,5 +1,5 @@
 # ======================================================================
-# METABASE AI (LabBase-5) SELF-ASSEMBLING MASTER ENGINE (HARDENED v1.2)
+# HermetiCore (HermetiCore) SELF-ASSEMBLING MASTER ENGINE (HARDENED v1.2)
 # Standard: ISO/IEC/IEEE 12207 | Zero-Global-Pollution | Windows Bare-Metal
 # ======================================================================
 # ADHD-Audit Fixes Applied (v1.2):
@@ -211,6 +211,6 @@ if (Test-Path $tempDir) {
 if (Test-Path $lockFile) { Remove-Item $lockFile -Force -ErrorAction SilentlyContinue }
 
 Write-Host "`n ======================================================================" -ForegroundColor Green
-Write-Host " [SUCCESS] MetaBase AI Spore Hydration Finished!" -ForegroundColor Green
+Write-Host " [SUCCESS] HermetiCore Spore Hydration Finished!" -ForegroundColor Green
 Write-Host " All Tier 1 Tools, MCPs, Skills, and Logs are 100% Active." -ForegroundColor Cyan
 Write-Host " ======================================================================" -ForegroundColor Green

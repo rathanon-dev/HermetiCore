@@ -2,7 +2,7 @@
 setlocal
 cd /d "%~dp0"
 echo ======================================================================
-echo  METABASE AI (LabBase-5) Auto Installer
+echo  HermetiCore (HermetiCore) Auto Installer
 echo ======================================================================
 echo.
 

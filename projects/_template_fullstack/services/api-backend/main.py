@@ -1,5 +1,5 @@
 """
-MetaBase AI - High-Performance FastAPI Modular Backend Service
+HermetiCore - High-Performance FastAPI Modular Backend Service
 Standard: ISO/IEC/IEEE 12207 | Modern PEP 621 pyproject.toml | Two-Tier Hermetic Runtime
 """
 from fastapi import FastAPI
@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 
 app = FastAPI(
-    title="MetaBase-AI API Service",
+    title="HermetiCore API Service",
     version="0.1.0",
     description="Modular backend service executing in isolated Tier 2 runtime."
 )

@@ -1,10 +1,10 @@
 @echo off
 setlocal enabledelayedexpansion
-title MetaBase AI - Ephemeral Session Launcher
+title HermetiCore - Ephemeral Session Launcher
 color 0A
 
 echo ======================================================================
-echo    METABASE AI (LabBase-5) Active Session
+echo    HermetiCore (HermetiCore) Active Session
 echo    Standard: ISO/IEC/IEEE 12207 ^| Zero-Global-Pollution
 echo ======================================================================
 echo.
@@ -26,4 +26,4 @@ echo.
 
 powershell -NoProfile -NoExit -ExecutionPolicy Bypass -Command ^
     "$env:PATH = '%ROOT%\tools\git\cmd;%ROOT%\tools\python;%ROOT%\tools\node;%ROOT%\tools\7zip;%ROOT%\tools\aria2;' + $env:PATH; " ^
-    "Write-Host ' [READY] MetaBase AI Session Active. Type exit to leave.' -ForegroundColor Green"
+    "Write-Host ' [READY] HermetiCore Session Active. Type exit to leave.' -ForegroundColor Green"

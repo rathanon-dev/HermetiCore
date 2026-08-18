@@ -1,10 +1,10 @@
 @echo off
 setlocal enabledelayedexpansion
-title MetaBase AI - 1-Click Autonomous Workspace
+title HermetiCore - 1-Click Autonomous Workspace
 color 0B
 
 echo ======================================================================
-echo    METABASE AI (LabBase-5) Autonomous Workstation
+echo    HermetiCore (HermetiCore) Autonomous Workstation
 echo    Standard: ISO/IEC/IEEE 12207 ^| Zero-Global-Pollution
 echo ======================================================================
 echo.
@@ -29,7 +29,7 @@ set "PATH=%ROOT%\tools\git\cmd;%ROOT%\tools\python;%ROOT%\tools\node;%ROOT%\tool
 
 echo.
 echo ======================================================================
-echo  [SUCCESS] MetaBase AI Environment Active!
+echo  [SUCCESS] HermetiCore Environment Active!
 echo ======================================================================
 echo.
 echo  To connect your AI Agent (Antigravity / Claude / Copilot), send this prompt:

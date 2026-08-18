@@ -2,11 +2,11 @@
 
 <div align="center">
 
-# ⚡ METABASE AI (LABBASE-5)
+# ⚡ HermetiCore
 ### Autonomous Zero-Footprint Engineering Workstation
 **The Universal, Self-Assembling Developer Environment for Autonomous AI Agents**
 
-[![Status](https://img.shields.io/badge/Status-Production%20Ready-00F0FF.svg?style=for-the-badge&logo=rocket)](https://github.com/rathanon-dev/MetaBase-AI)
+[![Status](https://img.shields.io/badge/Status-Production%20Ready-00F0FF.svg?style=for-the-badge&logo=rocket)](https://github.com/rathanon-dev/HermetiCore)
 [![Architecture](https://img.shields.io/badge/Standard-ISO%2FIEC%2FIEEE%2012207-7928CA.svg?style=for-the-badge&logo=blueprint)](doc/th/01_ARCHITECTURE.md)
 [![Separation](https://img.shields.io/badge/Isolation-Two--Tier%20Hermetic-00DF72.svg?style=for-the-badge&logo=shield)](doc/th/02_TWO_TIER_RULES.md)
 [![Playwright](https://img.shields.io/badge/Browser-Playwright%20MCP-FF0055.svg?style=for-the-badge&logo=playwright)](doc/th/03_PLAYWRIGHT_MCP_SPEC.md)
@@ -33,8 +33,8 @@
 
 ### 1. โคลน Repository
 ```powershell
-git clone https://github.com/rathanon-dev/MetaBase-AI.git
-cd MetaBase-AI
+git clone https://github.com/rathanon-dev/HermetiCore.git
+cd HermetiCore
 ```
 
 ### 2. รันสคริปต์ประกอบร่าง
@@ -52,7 +52,7 @@ cd MetaBase-AI
 ## 📂 แผนผังโครงสร้างโฟลเดอร์ (Directory Taxonomy)
 
 ```text
-MetaBase-AI/
+HermetiCore/
 ├── start.bat                 # ⚡ ดับเบิ้ลคลิกเพื่อ Auto-Install และเปิดใช้งานทันที
 ├── setup.ps1                 # 🧬 สคริปต์งอกระบบและดึง Toolchains/MCP/Skills
 ├── AI_BOOTSTRAP_PROTOCOL.md  # 📜 กฎควบคุม AI Agent ประจำระบบ

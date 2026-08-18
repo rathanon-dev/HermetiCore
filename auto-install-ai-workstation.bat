@@ -1,9 +1,9 @@
 @echo off
-title MetaBase AI - 1-Click Autonomous Workstation Installer
+title HermetiCore - 1-Click Autonomous Workstation Installer
 color 0B
 
 echo ======================================================================
-echo    METABASE AI (LabBase-5) Autonomous Foundation Installer
+echo    HermetiCore (HermetiCore) Autonomous Foundation Installer
 echo    Standard: ISO/IEC/IEEE 12207 ^| Twelve-Factor App ^| Zero-Pollution
 echo ======================================================================
 echo.

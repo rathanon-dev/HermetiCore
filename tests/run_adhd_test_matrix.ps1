@@ -1,5 +1,5 @@
 # ======================================================================
-# METABASE AI - ADHD AUTOMATED MULTI-SCENARIO STRESS-TEST SUITE
+# HermetiCore - ADHD AUTOMATED MULTI-SCENARIO STRESS-TEST SUITE
 # ======================================================================
 
 $scriptDir = $PSScriptRoot
@@ -43,7 +43,7 @@ function Reset-CleanState {
 }
 
 Write-Host "======================================================================" -ForegroundColor Cyan
-Write-Host " METABASE AI - RUNNING COMPREHENSIVE ADHD STRESS-TEST MATRIX" -ForegroundColor Cyan
+Write-Host " HermetiCore - RUNNING COMPREHENSIVE ADHD STRESS-TEST MATRIX" -ForegroundColor Cyan
 Write-Host " Target Directory: $TargetDir" -ForegroundColor Yellow
 Write-Host " Report Destination: $ReportPath" -ForegroundColor Yellow
 Write-Host "======================================================================`n" -ForegroundColor Cyan
@@ -208,7 +208,7 @@ foreach ($r in $results) {
 }
 
 $reportContent = @"
-# รายงานผลการทดสอบความทนทานระบบ MetaBase-AI (ADHD Stress-Test Report)
+# รายงานผลการทดสอบความทนทานระบบ HermetiCore (ADHD Stress-Test Report)
 
 - **วันและเวลาที่ทดสอบ:** $timestamp
 - **ตำแหน่งโฟลเดอร์ทดสอบ:** $TargetDir

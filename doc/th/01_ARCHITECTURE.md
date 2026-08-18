@@ -1,6 +1,6 @@
 <a id="top"></a>
 
-# 🏛️ สถาปัตยกรรมระบบ MetaBase AI (LabBase-5)
+# 🏛️ สถาปัตยกรรมระบบ HermetiCore
 [⬅️ กลับสู่หน้าหลัก (Back to README)](../../README.md) | [🇬🇧 Read in English](../en/01_ARCHITECTURE.md)
 
 ---

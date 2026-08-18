@@ -1,6 +1,6 @@
 <a id="top"></a>
 
-# 🏛️ MetaBase AI (LabBase-5) Architecture Specification
+# 🏛️ HermetiCore Architecture Specification
 [⬅️ Back to Main README](../../README.md) | [🇹🇭 อ่านฉบับภาษาไทย](../th/01_ARCHITECTURE.md)
 
 ---
