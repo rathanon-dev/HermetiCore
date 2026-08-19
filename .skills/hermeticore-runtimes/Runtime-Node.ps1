@@ -60,7 +60,7 @@ if (Test-Path $zipPath) {
 if ($isCorrupt) {
     Write-Host " [!] Corrupted Node.js archive detected from proxy cache! Triggering direct WAN fallback..." -ForegroundColor Yellow
     if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
-    Invoke-WebRequest -Uri $rawUrl -OutFile $zipPath -UseBasicParsing
+    & $aria2 -x 8 -s 8 -d $tempExtractDir -o $zipName $rawUrl --console-log-level=warn | Out-Null
     & $7za t $zipPath -bsp0 -bso0 | Out-Null
     if ($LASTEXITCODE -ne 0) {
         Write-Host " [-] Fatal: Node.js archive failed integrity check on direct origin." -ForegroundColor Red

@@ -111,7 +111,7 @@ function Download-And-Verify-Batch {
         if ($isCorrupt) {
             Write-Host "     [!] Archive '$($t.FileName)' failed integrity check! Triggering direct WAN fallback..." -ForegroundColor Yellow
             if (Test-Path $filePath) { Remove-Item $filePath -Force }
-            Invoke-WebRequest -Uri $t.DirectUrl -OutFile $filePath -UseBasicParsing
+            & $aria2 -x 8 -s 8 -d $tempExtractDir -o $t.FileName $t.DirectUrl --console-log-level=warn | Out-Null
             & $7za t $filePath -bsp0 -bso0 | Out-Null
             if ($LASTEXITCODE -ne 0) {
                 Write-Host "     [-] Fatal: '$($t.FileName)' is permanently corrupted on upstream." -ForegroundColor Red

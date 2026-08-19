@@ -60,7 +60,7 @@ if (Test-Path $nupkgPath) {
 if ($isCorrupt) {
     Write-Host " [!] Corrupted Python package detected from proxy cache! Triggering direct WAN fallback..." -ForegroundColor Yellow
     if (Test-Path $nupkgPath) { Remove-Item $nupkgPath -Force }
-    Invoke-WebRequest -Uri $rawUrl -OutFile $nupkgPath -UseBasicParsing
+    & $aria2 -x 8 -s 8 -d $tempExtractDir -o $nupkgName $rawUrl --console-log-level=warn | Out-Null
     & $7za t $nupkgPath -bsp0 -bso0 | Out-Null
     if ($LASTEXITCODE -ne 0) {
         Write-Host " [-] Fatal: Python package failed integrity check on direct origin." -ForegroundColor Red
