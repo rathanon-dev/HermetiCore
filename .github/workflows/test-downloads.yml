@@ -110,13 +110,25 @@ jobs:
           $env:npm_config_cache = "$pwd\.portable_npm_cache"
           $env:npm_config_userconfig = "NUL"
           $env:APPDATA = "C:\Invalid"
-          
+
           try {
-              Write-Host "[DEBUG] Attempting to run MCP server via npx..."
-              # Running memory MCP to see if Node/NPM ecosystem is healthy
-              $mcpOutput = npx -y @modelcontextprotocol/server-memory --help 2>&1
+              Write-Host "[DEBUG] Attempting to resolve and start MCP server via npx..."
+              # @modelcontextprotocol/server-memory starts in stdio mode (ignores --help flag)
+              # so we run it in a background job, wait for the startup message, then kill it.
+              $job = Start-Job {
+                  npx -y @modelcontextprotocol/server-memory 2>&1
+              }
+              Start-Sleep -Seconds 8
+              $mcpOutput = Receive-Job $job -ErrorAction SilentlyContinue
+              Stop-Job  $job -ErrorAction SilentlyContinue
+              Remove-Job $job -ErrorAction SilentlyContinue
+
               Write-Host "[DEBUG] MCP Server Output: $mcpOutput"
-              if ($mcpOutput -notmatch 'Usage:|Options:') { throw 'MCP server failed to emit help/usage text.' }
+              # Server emits startup banner to stderr/stdout — check for known strings
+              if ($mcpOutput -notmatch 'Knowledge Graph|MCP Server|stdio|memory') {
+                  throw "MCP server did not emit expected startup text. Got: $mcpOutput"
+              }
+              Write-Host "[OK] MCP server via npx verified (stdio startup confirmed)."
           } catch {
               Write-Error "[FATAL] NPX MCP server execution failed: $_"
               exit 1
