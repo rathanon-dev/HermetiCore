@@ -260,16 +260,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Lint — No bare Invoke-WebRequest in .ps1 files
+      - name: Lint — No bare Invoke-WebRequest for binary downloads in .ps1 files
         run: |
-          VIOLATIONS=$(grep -rn "Invoke-WebRequest" --include="*.ps1" . \
-            | grep -v "setup\.ps1" | grep -v "# EXCEPTION" | grep -v "# BANNED" || true)
+          echo "Scanning for banned Invoke-WebRequest -OutFile usage in PowerShell scripts..."
+          echo "(Rule: binary file downloads must use aria2c. API/metadata fetches are allowed.)"
+          # Only flag -OutFile downloads (binary files), not API/metadata fetches
+          VIOLATIONS=$(grep -rn "Invoke-WebRequest.*-OutFile\|-OutFile.*Invoke-WebRequest" --include="*.ps1" . \
+            | grep -v "setup\.ps1" \
+            | grep -v "# EXCEPTION" \
+            | grep -v "# BANNED" || true)
           if [ -n "$VIOLATIONS" ]; then
-            echo "❌ Invoke-WebRequest found in non-exempt .ps1 files:"
+            echo "❌ FAIL: Invoke-WebRequest -OutFile (binary download) found in non-exempt .ps1 files:"
             echo "$VIOLATIONS"
+            echo ""
+            echo "Use aria2c instead: & \$aria2 -x 8 -s 8 -d \$dir -o \$file \$url"
             exit 1
           fi
-          echo "✅ No banned Invoke-WebRequest"
+          echo "✅ PASS: No banned binary Invoke-WebRequest downloads found."
 
       - name: Lint — No dead file references in rule docs
         run: |

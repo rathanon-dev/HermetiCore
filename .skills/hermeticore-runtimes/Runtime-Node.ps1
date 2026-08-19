@@ -1,12 +1,18 @@
 param(
     [Parameter(Mandatory=$true)][string]$TargetProjectName,
-    [string]$NodeVersion = "20.17.0"
+    [string]$NodeVersion = "latest"
 )
 
 $root = (Resolve-Path "$PSScriptRoot\..\..").Path
 Import-Module (Join-Path $root ".skills\hermeticore-core\Core.psm1") -Force
 $proxyUrl = Get-HermetiProxy -WorkspaceRoot $root
 $toolsDir = Join-Path $root "tools"
+
+if ($NodeVersion -eq "latest") {
+    Write-Host " [*] Resolving latest Node.js..." -ForegroundColor Cyan -NoNewline
+    $NodeVersion = Get-HermetiLatestNodeVersion -ProxyUrl $proxyUrl
+    Write-Host " v$NodeVersion" -ForegroundColor Green
+}
 
 $projectRuntimeDir = Join-Path $root "projects\$TargetProjectName\runtime\tools\node"
 $tempExtractDir = Join-Path $root "projects\$TargetProjectName\runtime\temp_node"

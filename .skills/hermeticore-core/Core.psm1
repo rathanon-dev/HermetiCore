@@ -106,4 +106,36 @@ function Invoke-HermetiDownload {
     throw "Download failed across all engines for: $Url"
 }
 
-Export-ModuleMember -Function Get-HermetiProxy, Invoke-HermetiAPI, Expand-HermetiArchive, Invoke-HermetiDownload
+
+
+# ==============================================================================
+# Dynamic Version Resolution (Evergreen API Fetchers)
+# ==============================================================================
+
+function Get-HermetiLatestGitHubAsset {
+    param([string]$Repo, [string]$AssetRegex, [string]$ProxyUrl)
+    $url = "https://api.github.com/repos/$Repo/releases/latest"
+    $res = Invoke-HermetiAPI -Url $url -ProxyUrl $ProxyUrl -AsJson
+    if (-not $res) { throw "Failed to fetch GitHub release for $Repo" }
+    $asset = $res.assets | Where-Object { $_.name -match $AssetRegex } | Select-Object -First 1
+    if (-not $asset) { throw "No asset matching $AssetRegex found in $Repo" }
+    return $asset.browser_download_url
+}
+
+function Get-HermetiLatestNuGetVersion {
+    param([string]$PackageId, [string]$ProxyUrl)
+    $url = "https://azuresearch-usnc.nuget.org/query?q=packageid:$PackageId&prerelease=false"
+    $res = Invoke-HermetiAPI -Url $url -ProxyUrl $ProxyUrl -AsJson
+    if (-not $res -or -not $res.data) { throw "Failed to fetch NuGet version for $PackageId" }
+    return $res.data[0].version
+}
+
+function Get-HermetiLatestNodeVersion {
+    param([string]$ProxyUrl)
+    $url = "https://nodejs.org/dist/index.json"
+    $res = Invoke-HermetiAPI -Url $url -ProxyUrl $ProxyUrl -AsJson
+    if (-not $res) { throw "Failed to fetch Node.js versions" }
+    return $res[0].version.TrimStart('v')
+}
+
+Export-ModuleMember -Function Get-HermetiProxy, Invoke-HermetiAPI, Expand-HermetiArchive, Invoke-HermetiDownload, Get-HermetiLatestGitHubAsset, Get-HermetiLatestNuGetVersion, Get-HermetiLatestNodeVersion

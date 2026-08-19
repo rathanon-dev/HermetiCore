@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory=$true)][string]$TargetProjectName,
-    [string]$PythonVersion = "3.12.5",
+    [string]$PythonVersion = "latest",
     [string]$InstallPackages = ""
 )
 
@@ -8,6 +8,13 @@ $root = (Resolve-Path "$PSScriptRoot\..\..").Path
 Import-Module (Join-Path $root ".skills\hermeticore-core\Core.psm1") -Force
 $proxyUrl = Get-HermetiProxy -WorkspaceRoot $root
 $toolsDir = Join-Path $root "tools"
+$pkgId = if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") { "pythonarm64" } else { "python" }
+
+if ($PythonVersion -eq "latest") {
+    Write-Host " [*] Resolving latest Python ($pkgId)..." -ForegroundColor Cyan -NoNewline
+    $PythonVersion = Get-HermetiLatestNuGetVersion -PackageId $pkgId -ProxyUrl $proxyUrl
+    Write-Host " v$PythonVersion" -ForegroundColor Green
+}
 
 $projectRuntimeDir = Join-Path $root "projects\$TargetProjectName\runtime\tools\python"
 $tempExtractDir = Join-Path $root "projects\$TargetProjectName\runtime\temp_python"
