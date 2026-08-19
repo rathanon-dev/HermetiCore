@@ -233,23 +233,34 @@ if (-not (Test-Path $pythonExe)) {
     Remove-Item $pyNupkg -Force -ErrorAction SilentlyContinue
     Remove-Item $tempExtractDir -Recurse -Force -ErrorAction SilentlyContinue
 
-    # Fix NuGet Python _pth file: uncomment "import site" so ensurepip can load
-    # Without this, sys.path is restricted and ensurepip/pip cannot find their modules
-    Get-ChildItem -Path $pythonDir -Filter "*._pth" | ForEach-Object {
-        $content = Get-Content -Path $_.FullName
-        $content = $content -replace '#\s*import site', 'import site'
-        Set-Content -Path $_.FullName -Value $content
-        Write-Host " [*] Patched _pth: enabled 'import site' in $($_.Name)" -ForegroundColor DarkGray
+    # Fix NuGet Python _pth file if present: uncomment "import site" so ensurepip can load
+    # (Some NuGet Python versions include python3xx._pth that blocks sys.path by default)
+    $pthFiles = Get-ChildItem -Path $pythonDir -Filter "*._pth" -ErrorAction SilentlyContinue
+    if ($pthFiles) {
+        $pthFiles | ForEach-Object {
+            $content = Get-Content -Path $_.FullName
+            $content = $content -replace '#\s*import site', 'import site'
+            Set-Content -Path $_.FullName -Value $content
+            Write-Host " [*] Patched _pth: enabled 'import site' in $($_.Name)" -ForegroundColor DarkGray
+        }
     }
 
-    # Bootstrap pip via ensurepip (now works because _pth is patched above)
+    # Step 1: ensurepip (installs pip into site-packages)
     Write-Host " [*] Bootstrapping pip via ensurepip..." -ForegroundColor Cyan
     & $pythonExe -m ensurepip --upgrade 2>&1 | Out-Null
 
     $pipExe = Join-Path $pythonDir "Scripts\pip.exe"
+
+    # Step 2: pip.exe may be missing even when pip is in site-packages (Scripts/ exe not created)
+    #         force-reinstall to create the pip.exe launcher
     if (-not (Test-Path $pipExe)) {
-        # Fallback: download get-pip.py via aria2c
-        Write-Host " [*] ensurepip did not produce pip.exe — fallback to get-pip.py..." -ForegroundColor Yellow
+        Write-Host " [*] pip.exe missing from Scripts/ — force-reinstalling to create launcher..." -ForegroundColor Yellow
+        & $pythonExe -m pip install --force-reinstall --no-cache-dir pip 2>&1 | Out-Null
+    }
+
+    # Step 3: fallback — download get-pip.py via aria2c
+    if (-not (Test-Path $pipExe)) {
+        Write-Host " [*] Fallback: downloading get-pip.py via aria2c..." -ForegroundColor Yellow
         Ensure-TempDir
         $getPipPath = Join-Path $tempDir "get-pip.py"
         & $aria2Exe -x 4 -s 4 -d $tempDir -o "get-pip.py" (Get-DownloadUrl "https://bootstrap.pypa.io/get-pip.py") | Out-Null
@@ -260,11 +271,9 @@ if (-not (Test-Path $pythonExe)) {
     }
 
     if (Test-Path $pipExe) {
-        Write-Host " [OK] pip ready at: $pipExe" -ForegroundColor Green
-        # Upgrade pip to latest
-        & $pythonExe -m pip install --upgrade pip 2>&1 | Out-Null
+        Write-Host " [OK] pip ready: $(& $pythonExe -m pip --version 2>&1)" -ForegroundColor Green
     } else {
-        Write-Host " [WARN] pip.exe not found — pip may need manual bootstrap." -ForegroundColor Yellow
+        Write-Host " [WARN] pip.exe not found after all bootstrap attempts." -ForegroundColor Yellow
     }
 
     Write-Host " [OK] Python 3.12 Initialized (Native Portable via NuGet)." -ForegroundColor Green
