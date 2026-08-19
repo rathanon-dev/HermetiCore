@@ -68,8 +68,8 @@ if ($isCorrupt) {
     }
 }
 
-# 4. Extract Python Runtime
-Write-Host " [*] Extracting Python..." -ForegroundColor Cyan
+# 4. Extract Python Runtime (Official Microsoft NuGet Distribution)
+Write-Host " [*] Extracting Python (Microsoft NuGet Native)..." -ForegroundColor Cyan
 $outDir = Join-Path $tempExtractDir "out"
 & $7za x $nupkgPath "-o$outDir" -y -bsp0 -bso0 | Out-Null
 
@@ -78,14 +78,7 @@ if (-not (Test-Path (Join-Path $sourceTools "python.exe"))) { $sourceTools = $ou
 Copy-Item "$sourceTools\*" $projectRuntimeDir -Recurse -Force
 Remove-Item $tempExtractDir -Recurse -Force
 
-# 5. Enable site-packages in *._pth
-Get-ChildItem -Path $projectRuntimeDir -Filter "*._pth" | ForEach-Object {
-    $content = Get-Content -Path $_.FullName
-    $content = $content -replace '#\s*import site', 'import site'
-    Set-Content -Path $_.FullName -Value $content
-}
-
-# 6. Bootstrap Pip & Inject Project-Scoped pip.ini
+# 5. Bootstrap Pip & Inject Project-Scoped pip.ini
 $pyExe = Join-Path $projectRuntimeDir "python.exe"
 $pipDir = Join-Path $projectRuntimeDir "Scripts"
 & $pyExe -m ensurepip --upgrade | Out-Null
