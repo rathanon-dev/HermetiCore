@@ -14,4 +14,4 @@ SESSION_HANDOVER_LOG.md
 # Config & Secrets
 config/.env
 config/id_ed25519*
-.agents/
+

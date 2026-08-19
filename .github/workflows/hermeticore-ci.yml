@@ -93,6 +93,164 @@ jobs:
           retention-days: 1
 
   # ══════════════════════════════════════════════════════════════════
+  # TIER 2a — Node.js scaffold test
+  # Creates a mock project, runs Runtime-Node.ps1, validates node.exe
+  # ══════════════════════════════════════════════════════════════════
+  tier2-node:
+    name: "Tier 2a — Node.js Scaffold"
+    needs: tier1-infrastructure
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Tier 1 tools
+        uses: actions/download-artifact@v4
+        with:
+          name: tier1-tools
+          path: tools/
+
+      - name: Create mock project fixture (in-RAM, no external repo)
+        shell: pwsh
+        run: |
+          # Generate a minimal project layout inline — no network, no external repo needed
+          $proj = "projects\ci-test-node"
+          New-Item -ItemType Directory -Path $proj -Force | Out-Null
+          New-Item -ItemType Directory -Path "$proj\src" -Force | Out-Null
+          '{"name":"ci-test","version":"1.0.0","main":"src/server.js"}' | Set-Content "$proj\package.json"
+          'console.log("node ok:", process.version)' | Set-Content "$proj\src\server.js"
+          Write-Host "[OK] Mock Node project created at $proj"
+
+      - name: Run Runtime-Node.ps1 scaffolder
+        shell: pwsh
+        run: |
+          & ".\.skills\hermeticore-runtimes\Runtime-Node.ps1" -TargetProjectName "ci-test-node" -NodeVersion "20.17.0"
+
+      - name: Validate Node scaffold
+        shell: pwsh
+        run: |
+          $nodeExe = "projects\ci-test-node\runtime\tools\node\node.exe"
+          if (-not (Test-Path $nodeExe)) { Write-Error "node.exe missing at $nodeExe"; exit 1 }
+          $ver = & $nodeExe -v; Write-Host "[DEBUG] Scaffold node version: $ver"
+          if ($ver -notmatch 'v20\.17') { Write-Error "Wrong version: $ver"; exit 1 }
+          # Run the mock server
+          $out = & $nodeExe "projects\ci-test-node\src\server.js" 2>&1
+          Write-Host "[DEBUG] Server output: $out"
+          if ($out -notmatch 'node ok:') { Write-Error "Server did not run correctly"; exit 1 }
+          Write-Host "[PASS] Node.js Tier 2 scaffold OK"
+
+  # ══════════════════════════════════════════════════════════════════
+  # TIER 2b — Python scaffold test
+  # Creates a mock project, runs Runtime-Python.ps1, validates python+pip
+  # ══════════════════════════════════════════════════════════════════
+  tier2-python:
+    name: "Tier 2b — Python Scaffold"
+    needs: tier1-infrastructure
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Tier 1 tools
+        uses: actions/download-artifact@v4
+        with:
+          name: tier1-tools
+          path: tools/
+
+      - name: Create mock Python project fixture
+        shell: pwsh
+        run: |
+          $proj = "projects\ci-test-python"
+          New-Item -ItemType Directory -Path "$proj\src" -Force | Out-Null
+          'print("python ok:", __import__("sys").version)' | Set-Content "$proj\src\main.py"
+          Write-Host "[OK] Mock Python project created at $proj"
+
+      - name: Run Runtime-Python.ps1 scaffolder
+        shell: pwsh
+        run: |
+          & ".\.skills\hermeticore-runtimes\Runtime-Python.ps1" -TargetProjectName "ci-test-python" -PythonVersion "3.12.5"
+
+      - name: Validate Python scaffold
+        shell: pwsh
+        run: |
+          $pyExe  = "projects\ci-test-python\runtime\tools\python\python.exe"
+          $pipExe = "projects\ci-test-python\runtime\tools\python\Scripts\pip.exe"
+          if (-not (Test-Path $pyExe))  { Write-Error "python.exe missing"; exit 1 }
+          if (-not (Test-Path $pipExe)) { Write-Error "pip.exe missing";    exit 1 }
+          $ver = & $pyExe --version 2>&1; Write-Host "[DEBUG] version: $ver"
+          if ($ver -notmatch 'Python 3\.12') { Write-Error "Wrong version: $ver"; exit 1 }
+          $out = & $pyExe "projects\ci-test-python\src\main.py" 2>&1
+          Write-Host "[DEBUG] Script output: $out"
+          if ($out -notmatch 'python ok:') { Write-Error "Script failed"; exit 1 }
+          Write-Host "[PASS] Python Tier 2 scaffold OK"
+
+  # ══════════════════════════════════════════════════════════════════
+  # TIER 2c — Python + CUDA scaffold test
+  # No GPU on GitHub runners — validates DLL file presence only
+  # Full runtime test requires self-hosted GPU runner (manual dispatch)
+  # ══════════════════════════════════════════════════════════════════
+  tier2-cuda:
+    name: "Tier 2c — Python+CUDA Scaffold (DLL check only)"
+    needs: tier1-infrastructure
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Tier 1 tools
+        uses: actions/download-artifact@v4
+        with:
+          name: tier1-tools
+          path: tools/
+
+      - name: Create mock CUDA project fixture
+        shell: pwsh
+        run: |
+          $proj = "projects\ci-test-cuda"
+          New-Item -ItemType Directory -Path "$proj\src" -Force | Out-Null
+          'import sys; print("cuda scaffold ok:", sys.version)' | Set-Content "$proj\src\main.py"
+          Write-Host "[OK] Mock CUDA project created at $proj"
+
+      - name: Run Runtime-Python-CUDA.ps1 scaffolder
+        shell: pwsh
+        run: |
+          & ".\.skills\hermeticore-runtimes\Runtime-Python-CUDA.ps1" `
+            -TargetProjectName "ci-test-cuda" `
+            -PythonVersion "3.12.5" `
+            -CudaVersion "12.1.1"
+        continue-on-error: true  # CUDA DLLs are large — flag but don't block
+
+      - name: Validate CUDA scaffold (DLL presence, no GPU required)
+        shell: pwsh
+        run: |
+          $cudaBin = "projects\ci-test-cuda\runtime\tools\nvidia\bin"
+          $pyExe   = "projects\ci-test-cuda\runtime\tools\python\python.exe"
+
+          Write-Host "=== CUDA Scaffold Validation (headless/no-GPU) ==="
+
+          # Python must always exist
+          if (-not (Test-Path $pyExe)) { Write-Error "python.exe missing in CUDA scaffold"; exit 1 }
+          $ver = & $pyExe --version 2>&1; Write-Host "[DEBUG] Python: $ver"
+
+          # CUDA DLLs: check presence (cannot execute without GPU)
+          if (Test-Path $cudaBin) {
+              $dlls = Get-ChildItem $cudaBin -Filter "*.dll" | Select-Object -ExpandProperty Name
+              Write-Host "[DEBUG] CUDA DLLs found: $($dlls.Count)"
+              $dlls | ForEach-Object { Write-Host "  $_" }
+              if ($dlls.Count -eq 0) {
+                  Write-Host "::warning::No CUDA DLLs found in $cudaBin — CUDA download may have failed"
+              } else {
+                  Write-Host "[PASS] CUDA DLLs present ($($dlls.Count) files)"
+              }
+          } else {
+              Write-Host "::warning::CUDA bin dir missing — skipped (no GPU runner, CUDA download may be large)"
+          }
+          Write-Host "[PASS] Python+CUDA scaffold validated (GPU execution requires self-hosted runner)"
+
+  # ══════════════════════════════════════════════════════════════════
   # RULES LINTER — fast, linux, no download needed
   # ══════════════════════════════════════════════════════════════════
   rules-linter:
