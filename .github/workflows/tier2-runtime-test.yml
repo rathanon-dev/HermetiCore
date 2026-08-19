@@ -1,132 +1,14 @@
-name: Tier 2 Runtime Scaffold Test
-
+# ARCHIVED — superseded by hermeticore-ci.yml
+# This workflow is disabled. Use hermeticore-ci.yml instead.
+name: "[ARCHIVED] Tier 2 Runtime Scaffold Test"
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - '.skills/hermeticore-runtimes/**'
-      - 'setup.ps1'
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
-
+    inputs:
+      reason:
+        description: "Reason for manual trigger"
+        required: true
 jobs:
-  test-tier2-runtimes:
-    name: Tier 2 Scaffold — ${{ matrix.runtime }} on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest]
-        runtime: [Node, Python]
-
+  archived-notice:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Bootstrap Tier 1 (aria2, 7zip, git)
-        shell: pwsh
-        run: |
-          Write-Host "====================================================" -ForegroundColor Cyan
-          Write-Host " Bootstrapping Tier 1 tools via setup.ps1..." -ForegroundColor Cyan
-          Write-Host "====================================================" -ForegroundColor Cyan
-          ./setup.ps1
-          # Verify the two required tools for Tier 2 exist
-          if (-not (Test-Path ".\tools\aria2\aria2c.exe")) { throw "aria2c.exe not found after setup" }
-          if (-not (Test-Path ".\tools\7zip\7za.exe"))    { throw "7za.exe not found after setup" }
-          Write-Host "[OK] Tier 1 bootstrap confirmed — aria2c and 7za ready." -ForegroundColor Green
-
-      # ─── Node.js Tier 2 ───────────────────────────────────────────────────
-      - name: "[Node] Deploy Tier 2 Runtime"
-        if: matrix.runtime == 'Node'
-        shell: pwsh
-        run: |
-          & ".\.skills\hermeticore-runtimes\Runtime-Node.ps1" `
-              -TargetProjectName "ci-test-node" `
-              -NodeVersion "20.17.0"
-
-      - name: "[Node] Verify — Isolation & Version"
-        if: matrix.runtime == 'Node'
-        shell: pwsh
-        run: |
-          $nodeExe = ".\projects\ci-test-node\runtime\tools\node\node.exe"
-          if (-not (Test-Path $nodeExe)) {
-              throw "FAIL: node.exe not found at expected Tier 2 path: $nodeExe"
-          }
-          $ver = & $nodeExe --version 2>&1
-          Write-Host "[DEBUG] Node version: $ver"
-          if ($ver -notmatch 'v20\.') {
-              throw "FAIL: Expected Node v20.x, got: $ver"
-          }
-          # Isolation check: must NOT be system node
-          $absolutePath = (Resolve-Path $nodeExe).Path
-          if ($absolutePath -match 'hostedtoolcache|Program Files') {
-              throw "ISOLATION BREACH: Node resolved to system path: $absolutePath"
-          }
-          Write-Host "[OK] Tier 2 Node.js verified: $ver at $absolutePath" -ForegroundColor Green
-
-      - name: "[Node] Verify — Execute a test script"
-        if: matrix.runtime == 'Node'
-        shell: pwsh
-        run: |
-          $nodeExe = ".\projects\ci-test-node\runtime\tools\node\node.exe"
-          $out = & $nodeExe -e "console.log('arch:'+process.arch+' ver:'+process.version)"
-          Write-Host "[DEBUG] Script output: $out"
-          if ($out -notmatch 'arch:x64|arch:arm64') {
-              throw "FAIL: Unexpected script output: $out"
-          }
-          Write-Host "[OK] Node.js script execution confirmed." -ForegroundColor Green
-
-      # ─── Python Tier 2 ────────────────────────────────────────────────────
-      - name: "[Python] Deploy Tier 2 Runtime"
-        if: matrix.runtime == 'Python'
-        shell: pwsh
-        run: |
-          & ".\.skills\hermeticore-runtimes\Runtime-Python.ps1" `
-              -TargetProjectName "ci-test-python" `
-              -PythonVersion "3.12.5"
-
-      - name: "[Python] Verify — Isolation & Version"
-        if: matrix.runtime == 'Python'
-        shell: pwsh
-        run: |
-          $env:PYTHONNOUSERSITE = '1'
-          $pyExe = ".\projects\ci-test-python\runtime\tools\python\python.exe"
-          if (-not (Test-Path $pyExe)) {
-              throw "FAIL: python.exe not found at expected Tier 2 path: $pyExe"
-          }
-          $ver = & $pyExe --version 2>&1
-          Write-Host "[DEBUG] Python version: $ver"
-          if ($ver -notmatch 'Python 3\.12') {
-              throw "FAIL: Expected Python 3.12.x, got: $ver"
-          }
-          # Isolation check: must NOT be system python
-          $absolutePath = (Resolve-Path $pyExe).Path
-          if ($absolutePath -match 'hostedtoolcache|Program Files|runneradmin') {
-              throw "ISOLATION BREACH: Python resolved to system path: $absolutePath"
-          }
-          Write-Host "[OK] Tier 2 Python verified: $ver at $absolutePath" -ForegroundColor Green
-
-      - name: "[Python] Verify — pip & site-packages isolation"
-        if: matrix.runtime == 'Python'
-        shell: pwsh
-        run: |
-          $env:PYTHONNOUSERSITE = '1'
-          $pyExe = ".\projects\ci-test-python\runtime\tools\python\python.exe"
-          $pipVer = & $pyExe -m pip --version 2>&1
-          Write-Host "[DEBUG] Pip: $pipVer"
-          if (-not $pipVer) { throw "FAIL: pip not available" }
-
-          $site = & $pyExe -c "import site; print(site.getsitepackages()[0])"
-          Write-Host "[DEBUG] Site-packages: $site"
-          if ($site -match 'runneradmin|hostedtoolcache') {
-              throw "ISOLATION BREACH: site-packages leaked to host: $site"
-          }
-          Write-Host "[OK] pip and site-packages isolation verified." -ForegroundColor Green
-
-      - name: Final Summary
-        shell: pwsh
-        run: |
-          Write-Host "====================================================" -ForegroundColor Green
-          Write-Host " [PASS] Tier 2 ${{ matrix.runtime }} Runtime Test Complete!" -ForegroundColor Green
-          Write-Host "====================================================" -ForegroundColor Green
+      - run: echo "This workflow is archived. Use hermeticore-ci.yml"
