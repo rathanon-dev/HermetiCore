@@ -1,155 +1,64 @@
 param(
-    [Parameter(Mandatory=$true)]
-    [string]$TargetProjectName,
+    [Parameter(Mandatory=$true)][string]$TargetProjectName,
     [string]$PythonVersion = "3.12.5",
-    # Optional: space-separated pip packages to install after bootstrapping
-    # Example: -InstallPackages "fastapi uvicorn"
     [string]$InstallPackages = ""
 )
 
 $root = (Resolve-Path "$PSScriptRoot\..\..").Path
-$envFile = Join-Path $root "config\.env"
-$proxyUrl = $null
-$useProxy = $false
+Import-Module (Join-Path $root ".skills\hermeticore-core\Core.psm1") -Force
+$proxyUrl = Get-HermetiProxy -WorkspaceRoot $root
+$toolsDir = Join-Path $root "tools"
 
-# 1. OmniProxy Ingestion & Health Probe
-if (Test-Path $envFile) {
-    $envContent = Get-Content $envFile
-    $proxyMatch = $envContent | Where-Object { $_ -match "^OMNIPROXY_URL=`"(.*)`"" }
-    if ($proxyMatch) { $proxyUrl = $matches[1] }
-}
-
-if ($proxyUrl) {
-    try {
-        $uri = [System.Uri]$proxyUrl
-        $tcp = New-Object Net.Sockets.TcpClient
-        $async = $tcp.BeginConnect($uri.Host, $uri.Port, $null, $null)
-        if ($async.AsyncWaitHandle.WaitOne(1200, $true) -and $tcp.Connected) {
-            $useProxy = $true
-            Write-Host " [PROXY] OmniProxy LAN Gateway Active ($proxyUrl)" -ForegroundColor Green
-        }
-        $tcp.Close()
-    } catch {}
-}
-
-# 2. Setup Staging & Runtime Paths
 $projectRuntimeDir = Join-Path $root "projects\$TargetProjectName\runtime\tools\python"
-if (-not (Test-Path $projectRuntimeDir)) { New-Item -ItemType Directory -Path $projectRuntimeDir -Force | Out-Null }
 $tempExtractDir = Join-Path $root "projects\$TargetProjectName\runtime\temp_python"
-if (Test-Path $tempExtractDir) { Remove-Item $tempExtractDir -Recurse -Force }
-New-Item -ItemType Directory -Path $tempExtractDir -Force | Out-Null
+if (-not (Test-Path $tempExtractDir)) { New-Item -ItemType Directory -Path $tempExtractDir -Force | Out-Null }
 
+Write-Host " [*] Downloading Python v$PythonVersion (NuGet) for Tier 2..." -ForegroundColor Cyan
 $pkgId = if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") { "pythonarm64" } else { "python" }
 $nupkgName = "$pkgId.$PythonVersion.nupkg"
-$rawUrl = "https://api.nuget.org/v3-flatcontainer/$pkgId/$PythonVersion/$nupkgName"
-$dlUrl = if ($useProxy) { "$proxyUrl/$rawUrl" } else { $rawUrl }
+$dlUrl = "https://api.nuget.org/v3-flatcontainer/$pkgId/$PythonVersion/$nupkgName"
 $nupkgPath = Join-Path $tempExtractDir $nupkgName
 
-$aria2 = Join-Path $root "tools\aria2\aria2c.exe"
-$7za = Join-Path $root "tools\7zip\7za.exe"
-
-# 3. Download & Integrity Check with Fallback
-Write-Host " [*] Downloading Python v$PythonVersion (NuGet) for Tier 2..." -ForegroundColor Cyan
-& $aria2 -x 8 -s 8 -d $tempExtractDir -o $nupkgName $dlUrl | Out-Null
-
-$isCorrupt = $false
-if (Test-Path $nupkgPath) {
-    & $7za t $nupkgPath -bsp0 -bso0 | Out-Null
-    if ($LASTEXITCODE -ne 0) { $isCorrupt = $true }
-} else {
-    $isCorrupt = $true
-}
-
-if ($isCorrupt) {
-    Write-Host " [!] Corrupted Python package detected from proxy cache! Triggering direct WAN fallback..." -ForegroundColor Yellow
-    if (Test-Path $nupkgPath) { Remove-Item $nupkgPath -Force }
-    & $aria2 -x 8 -s 8 -d $tempExtractDir -o $nupkgName $rawUrl --console-log-level=warn | Out-Null
-    & $7za t $nupkgPath -bsp0 -bso0 | Out-Null
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host " [-] Fatal: Python package failed integrity check on direct origin." -ForegroundColor Red
-        exit 1
-    }
-}
-
-# 4. Extract Python Runtime (Official Microsoft NuGet Distribution)
+Invoke-HermetiDownload -Url $dlUrl -OutFile $nupkgPath -ProxyUrl $proxyUrl -ToolsDir $toolsDir
 Write-Host " [*] Extracting Python (Microsoft NuGet Native)..." -ForegroundColor Cyan
 $outDir = Join-Path $tempExtractDir "out"
-& $7za x $nupkgPath "-o$outDir" -y -bsp0 -bso0 | Out-Null
+Expand-HermetiArchive -FilePath $nupkgPath -Destination $outDir -ToolsDir $toolsDir
 
-$sourceTools = Join-Path $outDir "tools"
-if (-not (Test-Path (Join-Path $sourceTools "python.exe"))) { $sourceTools = $outDir }
+$sourceTools = if (Test-Path "$outDir\tools\python.exe") { "$outDir\tools" } else { $outDir }
+if (-not (Test-Path $projectRuntimeDir)) { New-Item -ItemType Directory -Path $projectRuntimeDir -Force | Out-Null }
 Copy-Item "$sourceTools\*" $projectRuntimeDir -Recurse -Force
 Remove-Item $tempExtractDir -Recurse -Force
 
-# 5. Bootstrap Pip — same 3-step chain as setup.ps1
+# Pip Bootstrap
 $pyExe  = Join-Path $projectRuntimeDir "python.exe"
-$pipDir = Join-Path $projectRuntimeDir "Scripts"
-$pipExe = Join-Path $pipDir "pip.exe"
-
-# Step A: patch _pth if present (NuGet Python blocks sys.path without this)
+$pipExe = Join-Path $projectRuntimeDir "Scripts\pip.exe"
 Get-ChildItem -Path $projectRuntimeDir -Filter "*._pth" -ErrorAction SilentlyContinue | ForEach-Object {
-    $c = Get-Content $_.FullName
-    $c = $c -replace '#\s*import site', 'import site'
-    Set-Content $_.FullName -Value $c
-    Write-Host " [*] Patched _pth: $($_.Name)" -ForegroundColor DarkGray
+    $c = Get-Content $_.FullName; $c = $c -replace '#\s*import site', 'import site'; Set-Content $_.FullName -Value $c
 }
-
-# Step B: ensurepip
 Write-Host " [*] Bootstrapping pip via ensurepip..." -ForegroundColor Cyan
 & $pyExe -m ensurepip --upgrade 2>&1 | Out-Null
-
-# Step C: force-reinstall if pip.exe launcher still missing
 if (-not (Test-Path $pipExe)) {
-    Write-Host " [*] pip.exe missing — force-reinstalling to create launcher..." -ForegroundColor Yellow
     & $pyExe -m pip install --force-reinstall --no-cache-dir pip 2>&1 | Out-Null
 }
-
-# Step D: fallback — get-pip.py via aria2c
 if (-not (Test-Path $pipExe)) {
-    Write-Host " [*] Fallback: downloading get-pip.py via aria2c..." -ForegroundColor Yellow
     $getPipPath = Join-Path $projectRuntimeDir "get-pip.py"
-    & $aria2 -x 4 -s 4 -d $projectRuntimeDir -o "get-pip.py" "https://bootstrap.pypa.io/get-pip.py" | Out-Null
-    if (Test-Path $getPipPath) {
-        & $pyExe $getPipPath --no-warn-script-location 2>&1 | Out-Null
-        Remove-Item $getPipPath -Force -ErrorAction SilentlyContinue
-    }
+    Invoke-HermetiDownload -Url "https://bootstrap.pypa.io/get-pip.py" -OutFile $getPipPath -ProxyUrl $proxyUrl -ToolsDir $toolsDir
+    & $pyExe $getPipPath --no-warn-script-location 2>&1 | Out-Null
+    Remove-Item $getPipPath -Force -ErrorAction SilentlyContinue
 }
 
-if (Test-Path $pipExe) {
-    Write-Host " [OK] pip bootstrapped successfully." -ForegroundColor Green
-} else {
-    Write-Host " [ERROR] pip.exe not found after all bootstrap attempts." -ForegroundColor Red
-}
-
-
-if ($useProxy) {
+if ($proxyUrl) {
     $proxyHost = ([System.Uri]$proxyUrl).Host
     $pipIniPath = Join-Path $projectRuntimeDir "pip.ini"
-    $pipIniContent = @"
-[global]
-index-url = $proxyUrl/pypi/simple/
-trusted-host = $proxyHost
-timeout = 30
-"@
-    Set-Content -Path $pipIniPath -Value $pipIniContent -Encoding ASCII
-
-    # Also set pip config internally
+    "[global]`nindex-url = $proxyUrl/pypi/simple/`ntrusted-host = $proxyHost`ntimeout = 30" | Set-Content $pipIniPath
     & $pyExe -m pip config set global.index-url "$proxyUrl/pypi/simple/" | Out-Null
     & $pyExe -m pip config set global.trusted-host $proxyHost | Out-Null
-    Write-Host " [+] Project-scoped pip.ini configured for OmniProxy ($pipIniPath)" -ForegroundColor Green
 }
 
-# 6. Optional: Install packages specified by -InstallPackages
 if ($InstallPackages) {
     $pkgList = $InstallPackages -split '\s+' | Where-Object { $_ -ne "" }
     Write-Host " [*] Installing packages: $($pkgList -join ', ')..." -ForegroundColor Cyan
-    & $pyExe -m pip install @pkgList 2>&1 | Tee-Object -Variable pipOut | Out-Null
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host " [WARN] One or more packages failed to install. Check output above." -ForegroundColor Yellow
-    } else {
-        Write-Host " [OK] Packages installed: $($pkgList -join ', ')" -ForegroundColor Green
-    }
+    & $pyExe -m pip install @pkgList 2>&1 | Out-Null
 }
 
-Get-ChildItem $projectRuntimeDir -Filter "*.exe" -Recurse | ForEach-Object { Unblock-File $_.FullName -ErrorAction SilentlyContinue }
 Write-Host " [OK] Tier 2 Python Isolated Runtime Created at: $projectRuntimeDir" -ForegroundColor Green
