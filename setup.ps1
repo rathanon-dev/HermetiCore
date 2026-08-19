@@ -233,14 +233,25 @@ if (-not (Test-Path $pythonExe)) {
     Remove-Item $pyNupkg -Force -ErrorAction SilentlyContinue
     Remove-Item $tempExtractDir -Recurse -Force -ErrorAction SilentlyContinue
 
-    # Bootstrap pip — NuGet Python does NOT include pip.exe by default
-    # Must run ensurepip so CI validations and Tier 2 projects can use pip
-    Write-Host " [*] Bootstrapping pip via ensurepip..." -ForegroundColor Cyan
-    & $pythonExe -m ensurepip --upgrade 2>&1 | Out-Null
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host " [WARN] ensurepip returned non-zero — pip may be absent." -ForegroundColor Yellow
+    # Bootstrap pip via get-pip.py (more reliable than ensurepip for NuGet Python)
+    # NuGet Python has a python312._pth file that restricts sys.path and blocks ensurepip.
+    # get-pip.py bypasses this limitation. aria2c is already available at this point.
+    Write-Host " [*] Bootstrapping pip via get-pip.py (aria2c download)..." -ForegroundColor Cyan
+    Ensure-TempDir
+    $getPipPath = Join-Path $tempDir "get-pip.py"
+    $getPipUrl  = "https://bootstrap.pypa.io/get-pip.py"
+    & $aria2Exe -x 4 -s 4 -d $tempDir -o "get-pip.py" (Get-DownloadUrl $getPipUrl) | Out-Null
+    if (Test-Path $getPipPath) {
+        & $pythonExe $getPipPath --no-warn-script-location 2>&1 | Out-Null
+        $pipExe = Join-Path $pythonDir "Scripts\pip.exe"
+        if (Test-Path $pipExe) {
+            Write-Host " [OK] pip installed successfully via get-pip.py." -ForegroundColor Green
+        } else {
+            Write-Host " [WARN] pip.exe not found after get-pip.py — pip may require manual bootstrap." -ForegroundColor Yellow
+        }
+        Remove-Item $getPipPath -Force -ErrorAction SilentlyContinue
     } else {
-        Write-Host " [OK] pip bootstrapped into tools/python/Scripts/." -ForegroundColor DarkGray
+        Write-Host " [WARN] get-pip.py download failed — pip will not be available." -ForegroundColor Yellow
     }
 
     Write-Host " [OK] Python 3.12 Initialized (Native Portable via NuGet)." -ForegroundColor Green
