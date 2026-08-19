@@ -32,7 +32,8 @@ if ($pthFile) {
 if (-not (Test-Path "$runtimeDir\Scripts\pip.exe")) {
     Write-Host "Installing pip into Tier 2..." -ForegroundColor Yellow
     $getPip = "$comfyDir\get-pip.py"
-    Invoke-WebRequest -Uri "$proxyUrl/https://bootstrap.pypa.io/get-pip.py" -OutFile $getPip -UseBasicParsing
+    $aria2 = ".\tools\aria2\aria2c.exe"
+    & $aria2 -x 8 -s 8 -d $comfyDir -o "get-pip.py" "$proxyUrl/https://bootstrap.pypa.io/get-pip.py"
     & "$runtimeDir\python.exe" $getPip
 }
 

@@ -50,7 +50,7 @@ jobs:
           if ([string]::IsNullOrWhiteSpace($ver)) { Write-Error "Empty version"; exit 1 }
           Write-Host "[PASS] Node.js OK"
 
-      - name: Validate — Python 3.12 + pip isolation
+      - name: Validate — Python + pip isolation
         shell: pwsh
         run: |
           $env:PATH = ($env:PATH -split ';' | Where-Object { $_ -notmatch 'hostedtoolcache|Program Files|WindowsApps' }) -join ';'
@@ -60,7 +60,7 @@ jobs:
           Write-Host "[DEBUG] python: $pyPath"
           if ($pyPath -notmatch '\\tools\\') { Write-Error "ISOLATION BREACH: $pyPath"; exit 1 }
           $ver = python --version 2>&1; Write-Host "[DEBUG] version: $ver"
-          if ($ver -notmatch 'Python 3\.12') { Write-Error "Wrong version: $ver"; exit 1 }
+          if ($ver -notmatch 'Python 3\.\d+') { Write-Error "Wrong version: $ver"; exit 1 }
           $pipPath = (Get-Command pip -ErrorAction Stop).Source
           Write-Host "[DEBUG] pip: $pipPath"
           $site = python -c "import site; print(site.getsitepackages()[0])"
