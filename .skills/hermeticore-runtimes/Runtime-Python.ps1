@@ -3,7 +3,7 @@ param(
     [string]$PythonVersion = "3.12.5"
 )
 
-$root = (Resolve-Path "..\..\").Path
+$root = (Resolve-Path "$PSScriptRoot\..\..").Path
 $envFile = Join-Path $root "config\.env"
 $proxyUrl = $null
 $useProxy = $false
@@ -49,7 +49,7 @@ Write-Host " [*] Downloading Python v$PythonVersion (NuGet) for Tier 2..." -Fore
 & $aria2 -x 8 -s 8 -d $tempExtractDir -o $nupkgName $dlUrl | Out-Null
 
 # 5. Extract
-$7za = Join-Path $root "tools\7z\7za.exe"
+$7za = Join-Path $root "tools\7zip\7za.exe"
 Write-Host " [*] Extracting Python..." -ForegroundColor Cyan
 & $7za x $nupkgPath "-o$tempExtractDir\out" -y -bsp0 -bso0 | Out-Null
 

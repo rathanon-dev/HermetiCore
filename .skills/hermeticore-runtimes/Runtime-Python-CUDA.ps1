@@ -67,6 +67,10 @@ $cudaRedistUrl = "https://developer.download.nvidia.com/compute/cuda/redist/redi
 if ($useProxy) { $cudaRedistUrl = "$proxyUrl/$cudaRedistUrl" }
 $cudaManifest = Invoke-RestMethod -Uri $cudaRedistUrl -UseBasicParsing
 
+$cudaQueueFile = Join-Path $tempExtractDir "cuda_aria2_queue.txt"
+$cudaQueueLines = @()
+$cudaFilesToExtract = @()
+
 foreach ($comp in $eliteCudaComponents) {
     $winPkg = $cudaManifest.$comp.'windows-x86_64'
     if ($winPkg -and $winPkg.relative_path) {
@@ -74,10 +78,20 @@ foreach ($comp in $eliteCudaComponents) {
         if ($useProxy) { $dlUrl = "$proxyUrl/$dlUrl" }
         $fName = Split-Path $winPkg.relative_path -Leaf
         
-        Write-Host "     [>] Downloading $comp..." -ForegroundColor Gray
-        & $aria2 -x 8 -s 8 -d $tempExtractDir -o $fName $dlUrl | Out-Null
-        
-        Write-Host "     [>] Extracting DLLs from $comp -> nvidia\cuda\bin" -ForegroundColor Gray
+        $cudaQueueLines += $dlUrl
+        $cudaQueueLines += "  dir=$tempExtractDir"
+        $cudaQueueLines += "  out=$fName"
+        $cudaFilesToExtract += $fName
+    }
+}
+
+if ($cudaQueueLines.Count -gt 0) {
+    Set-Content -Path $cudaQueueFile -Value $cudaQueueLines -Encoding UTF8
+    Write-Host "     [>] Batch Downloading $($cudaFilesToExtract.Count) CUDA Components..." -ForegroundColor Gray
+    & $aria2 --input-file=$cudaQueueFile -j 4 -x 4 -s 4 --console-log-level=warn | Out-Null
+    
+    foreach ($fName in $cudaFilesToExtract) {
+        Write-Host "     [>] Extracting DLLs from $fName -> nvidia\cuda\bin" -ForegroundColor Gray
         & $7za e "$tempExtractDir\$fName" "-o$cudaBinDir" "*.dll" -r -y -bsp0 -bso0 | Out-Null
     }
 }
@@ -126,6 +140,10 @@ if (-not [string]::IsNullOrEmpty($targetCudnnVer)) {
     if ($useProxy) { $cudnnRedistUrl = "$proxyUrl/$cudnnRedistUrl" }
     $cudnnManifest = Invoke-RestMethod -Uri $cudnnRedistUrl -UseBasicParsing
     
+    $cudnnQueueFile = Join-Path $tempExtractDir "cudnn_aria2_queue.txt"
+    $cudnnQueueLines = @()
+    $cudnnFilesToExtract = @()
+
     foreach ($rp in $cudnnManifest.psobject.Properties) {
         $winNode = $rp.Value.'windows-x86_64'
         if ($winNode) {
@@ -141,13 +159,23 @@ if (-not [string]::IsNullOrEmpty($targetCudnnVer)) {
                 if ($useProxy) { $dlUrl = "$proxyUrl/$dlUrl" }
                 $fName = Split-Path $relPath -Leaf
                 
-                Write-Host "     [>] Downloading cuDNN module $fName..." -ForegroundColor Gray
-                & $aria2 -x 8 -s 8 -d $tempExtractDir -o $fName $dlUrl | Out-Null
-                
-                Write-Host "     [>] Extracting cuDNN DLLs -> nvidia\cudnn\bin" -ForegroundColor Gray
-                foreach ($filter in $cudnnTargets) {
-                    & $7za e "$tempExtractDir\$fName" "-o$cudnnBinDir" $filter -r -y -bsp0 -bso0 | Out-Null
-                }
+                $cudnnQueueLines += $dlUrl
+                $cudnnQueueLines += "  dir=$tempExtractDir"
+                $cudnnQueueLines += "  out=$fName"
+                $cudnnFilesToExtract += $fName
+            }
+        }
+    }
+
+    if ($cudnnQueueLines.Count -gt 0) {
+        Set-Content -Path $cudnnQueueFile -Value $cudnnQueueLines -Encoding UTF8
+        Write-Host "     [>] Batch Downloading $($cudnnFilesToExtract.Count) cuDNN Modules..." -ForegroundColor Gray
+        & $aria2 --input-file=$cudnnQueueFile -j 4 -x 4 -s 4 --console-log-level=warn | Out-Null
+        
+        foreach ($fName in $cudnnFilesToExtract) {
+            Write-Host "     [>] Extracting cuDNN DLLs from $fName -> nvidia\cudnn\bin" -ForegroundColor Gray
+            foreach ($filter in $cudnnTargets) {
+                & $7za e "$tempExtractDir\$fName" "-o$cudnnBinDir" $filter -r -y -bsp0 -bso0 | Out-Null
             }
         }
     }

@@ -3,7 +3,7 @@ param(
     [string]$NodeVersion = "20.17.0"
 )
 
-$root = (Resolve-Path "..\..\").Path
+$root = (Resolve-Path "$PSScriptRoot\..\..").Path
 $envFile = Join-Path $root "config\.env"
 $proxyUrl = $null
 $useProxy = $false
@@ -50,7 +50,7 @@ Write-Host " [*] Downloading Node.js v$NodeVersion for Tier 2..." -ForegroundCol
 & $aria2 -x 8 -s 8 -d $tempExtractDir -o $zipName $dlUrl | Out-Null
 
 # 5. Extract using Tier 1 7-Zip
-$7za = Join-Path $root "tools\7z\7za.exe"
+$7za = Join-Path $root "tools\7zip\7za.exe"
 Write-Host " [*] Extracting Node.js..." -ForegroundColor Cyan
 & $7za x $zipPath "-o$tempExtractDir\out" -y -bsp0 -bso0 | Out-Null
 
