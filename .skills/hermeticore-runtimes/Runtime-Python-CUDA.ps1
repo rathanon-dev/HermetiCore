@@ -11,6 +11,7 @@ $envFile = Join-Path $root "config\.env"
 $proxyUrl = $null
 $useProxy = $false
 
+# 1. OmniProxy Ingestion & Health Probe
 if (Test-Path $envFile) {
     $envContent = Get-Content $envFile
     $proxyMatch = $envContent | Where-Object { $_ -match "^OMNIPROXY_URL=`"(.*)`"" }
@@ -24,16 +25,16 @@ if ($proxyUrl) {
         $async = $tcp.BeginConnect($uri.Host, $uri.Port, $null, $null)
         if ($async.AsyncWaitHandle.WaitOne(1200, $true) -and $tcp.Connected) {
             $useProxy = $true
-            Write-Host " [PROXY] OmniProxy LAN Gateway Connected ($proxyUrl)" -ForegroundColor Green
+            Write-Host " [PROXY] OmniProxy LAN Gateway Active ($proxyUrl)" -ForegroundColor Green
         }
         $tcp.Close()
     } catch {}
 }
 
-# 1. Scaffold Python Base
+# 2. Bootstrap Base Python via Runtime-Python.ps1
 & "$PSScriptRoot\Runtime-Python.ps1" -TargetProjectName $TargetProjectName -PythonVersion $PythonVersion
 
-# 2. CUDA & cuDNN Setup
+# 3. Setup CUDA & cuDNN Output Directories
 $cudaBinDir = Join-Path $root "projects\$TargetProjectName\runtime\tools\nvidia\cuda\bin"
 $cudnnBinDir = Join-Path $root "projects\$TargetProjectName\runtime\tools\nvidia\cudnn\bin"
 if (-not (Test-Path $cudaBinDir)) { New-Item -ItemType Directory -Path $cudaBinDir -Force | Out-Null }
@@ -59,40 +60,102 @@ $cudnnTargets = @(
     "cudnn_ops64_*.dll", "cudnn64_*.dll"
 )
 
+# Helper function to download, verify, and fallback
+function Download-And-Verify-Batch {
+    param(
+        [Parameter(Mandatory=$true)][array]$Tasks,
+        [Parameter(Mandatory=$true)][string]$BatchName
+    )
+
+    if ($Tasks.Count -eq 0) { return }
+
+    # Deduplicate download tasks by FileName
+    $uniqueTasks = @{}
+    foreach ($t in $Tasks) {
+        if (-not $uniqueTasks.ContainsKey($t.FileName)) {
+            $uniqueTasks[$t.FileName] = $t
+        }
+    }
+
+    $queueFile = Join-Path $tempExtractDir "${BatchName}_aria2_queue.txt"
+    $queueLines = @()
+    foreach ($t in $uniqueTasks.Values) {
+        $queueLines += $t.ProxyUrl
+        $queueLines += "  dir=$tempExtractDir"
+        $queueLines += "  out=$($t.FileName)"
+    }
+
+    Set-Content -Path $queueFile -Value $queueLines -Encoding UTF8
+    Write-Host "     [>] Batch Downloading $($uniqueTasks.Count) $BatchName Components..." -ForegroundColor Gray
+    & $aria2 --input-file=$queueFile -j 4 -x 4 -s 4 --console-log-level=warn | Out-Null
+    Remove-Item $queueFile -Force -ErrorAction SilentlyContinue
+
+    # Integrity & Size Validation Gate
+    Write-Host "     [>] Validating $BatchName payload integrity (7za test & size)..." -ForegroundColor Gray
+    foreach ($t in $uniqueTasks.Values) {
+        $filePath = Join-Path $tempExtractDir $t.FileName
+        $isCorrupt = $false
+
+        if (Test-Path $filePath) {
+            # 1. Byte Size Verification (if size provided in manifest)
+            if ($t.ExpectedSize -and ((Get-Item $filePath).Length -ne $t.ExpectedSize)) {
+                $isCorrupt = $true
+            }
+            # 2. Archive CRC / Structure Test
+            & $7za t $filePath -bsp0 -bso0 | Out-Null
+            if ($LASTEXITCODE -ne 0) { $isCorrupt = $true }
+        } else {
+            $isCorrupt = $true
+        }
+
+        if ($isCorrupt) {
+            Write-Host "     [!] Archive '$($t.FileName)' failed integrity check! Triggering direct WAN fallback..." -ForegroundColor Yellow
+            if (Test-Path $filePath) { Remove-Item $filePath -Force }
+            Invoke-WebRequest -Uri $t.DirectUrl -OutFile $filePath -UseBasicParsing
+            & $7za t $filePath -bsp0 -bso0 | Out-Null
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "     [-] Fatal: '$($t.FileName)' is permanently corrupted on upstream." -ForegroundColor Red
+            } else {
+                Write-Host "     [+] Fallback recovered '$($t.FileName)' successfully." -ForegroundColor Green
+            }
+        }
+    }
+}
+
 # --------------------------------------------------------
 # [PHASE 1] INSTALL CUDA
 # --------------------------------------------------------
 Write-Host " [*] Fetching CUDA v$CudaVersion redist JSON..." -ForegroundColor Cyan
 $cudaRedistUrl = "https://developer.download.nvidia.com/compute/cuda/redist/redistrib_${CudaVersion}.json"
-if ($useProxy) { $cudaRedistUrl = "$proxyUrl/$cudaRedistUrl" }
-$cudaManifest = Invoke-RestMethod -Uri $cudaRedistUrl -UseBasicParsing
+$effectiveCudaUrl = if ($useProxy) { "$proxyUrl/$cudaRedistUrl" } else { $cudaRedistUrl }
+$cudaManifest = Invoke-RestMethod -Uri $effectiveCudaUrl -UseBasicParsing
 
-$cudaQueueFile = Join-Path $tempExtractDir "cuda_aria2_queue.txt"
-$cudaQueueLines = @()
-$cudaFilesToExtract = @()
-
+$cudaDownloadTasks = @()
 foreach ($comp in $eliteCudaComponents) {
     $winPkg = $cudaManifest.$comp.'windows-x86_64'
     if ($winPkg -and $winPkg.relative_path) {
-        $dlUrl = "https://developer.download.nvidia.com/compute/cuda/redist/$($winPkg.relative_path)"
-        if ($useProxy) { $dlUrl = "$proxyUrl/$dlUrl" }
+        $directUrl = "https://developer.download.nvidia.com/compute/cuda/redist/$($winPkg.relative_path)"
+        $pUrl = if ($useProxy) { "$proxyUrl/$directUrl" } else { $directUrl }
         $fName = Split-Path $winPkg.relative_path -Leaf
-        
-        $cudaQueueLines += $dlUrl
-        $cudaQueueLines += "  dir=$tempExtractDir"
-        $cudaQueueLines += "  out=$fName"
-        $cudaFilesToExtract += $fName
+
+        $cudaDownloadTasks += [PSCustomObject]@{
+            FileName     = $fName
+            DirectUrl    = $directUrl
+            ProxyUrl     = $pUrl
+            ExpectedSize = [long]$winPkg.size
+        }
     }
 }
 
-if ($cudaQueueLines.Count -gt 0) {
-    Set-Content -Path $cudaQueueFile -Value $cudaQueueLines -Encoding UTF8
-    Write-Host "     [>] Batch Downloading $($cudaFilesToExtract.Count) CUDA Components..." -ForegroundColor Gray
-    & $aria2 --input-file=$cudaQueueFile -j 4 -x 4 -s 4 --console-log-level=warn | Out-Null
-    
-    foreach ($fName in $cudaFilesToExtract) {
+Download-And-Verify-Batch -Tasks $cudaDownloadTasks -BatchName "CUDA"
+
+# Extract CUDA DLLs
+$uniqueCudaFiles = $cudaDownloadTasks | Select-Object -ExpandProperty FileName -Unique
+foreach ($fName in $uniqueCudaFiles) {
+    $srcZip = Join-Path $tempExtractDir $fName
+    if (Test-Path $srcZip) {
         Write-Host "     [>] Extracting DLLs from $fName -> nvidia\cuda\bin" -ForegroundColor Gray
-        & $7za e "$tempExtractDir\$fName" "-o$cudaBinDir" "*.dll" -r -y -bsp0 -bso0 | Out-Null
+        & $7za e $srcZip "-o$cudaBinDir" "*.dll" -r -y -bsp0 -bso0 | Out-Null
     }
 }
 Write-Host " [+] Tier 2 CUDA Installed at: $cudaBinDir" -ForegroundColor Green
@@ -106,17 +169,17 @@ $targetCudnnVer = $CudnnVersion
 if ([string]::IsNullOrEmpty($targetCudnnVer)) {
     Write-Host " [*] Auto-matching cuDNN for CUDA ${activeCudaMajor}.x..." -ForegroundColor Cyan
     $indexUrl = "https://developer.download.nvidia.com/compute/cudnn/redist/"
-    if ($useProxy) { $indexUrl = "$proxyUrl/$indexUrl" }
-    $indexRes = Invoke-WebRequest -Uri $indexUrl -UseBasicParsing
+    $effectiveIndexUrl = if ($useProxy) { "$proxyUrl/$indexUrl" } else { $indexUrl }
+    $indexRes = Invoke-WebRequest -Uri $effectiveIndexUrl -UseBasicParsing
     $regex = "redistrib_([0-9]+\.[0-9]+\.[0-9]+(?:\.[0-9]+)?)\.json"
     $matches = [regex]::Matches($indexRes.Content, $regex)
     $availableCudnn = $matches | ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique | Sort-Object { try { [version]$_ } catch { [version]"0.0.0" } } -Descending
     
     foreach ($ver in $availableCudnn) {
         $manifestUrl = "https://developer.download.nvidia.com/compute/cudnn/redist/redistrib_${ver}.json"
-        if ($useProxy) { $manifestUrl = "$proxyUrl/$manifestUrl" }
+        $effectiveManifestUrl = if ($useProxy) { "$proxyUrl/$manifestUrl" } else { $manifestUrl }
         try {
-            $manifestData = Invoke-RestMethod -Uri $manifestUrl -UseBasicParsing
+            $manifestData = Invoke-RestMethod -Uri $effectiveManifestUrl -UseBasicParsing
             $isMatch = $false
             foreach ($rp in $manifestData.psobject.Properties) {
                 $winNode = $rp.Value.'windows-x86_64'
@@ -137,13 +200,10 @@ if ([string]::IsNullOrEmpty($targetCudnnVer)) {
 if (-not [string]::IsNullOrEmpty($targetCudnnVer)) {
     Write-Host " [*] Selected cuDNN v$targetCudnnVer. Fetching redist JSON..." -ForegroundColor Cyan
     $cudnnRedistUrl = "https://developer.download.nvidia.com/compute/cudnn/redist/redistrib_${targetCudnnVer}.json"
-    if ($useProxy) { $cudnnRedistUrl = "$proxyUrl/$cudnnRedistUrl" }
-    $cudnnManifest = Invoke-RestMethod -Uri $cudnnRedistUrl -UseBasicParsing
-    
-    $cudnnQueueFile = Join-Path $tempExtractDir "cudnn_aria2_queue.txt"
-    $cudnnQueueLines = @()
-    $cudnnFilesToExtract = @()
+    $effectiveCudnnUrl = if ($useProxy) { "$proxyUrl/$cudnnRedistUrl" } else { $cudnnRedistUrl }
+    $cudnnManifest = Invoke-RestMethod -Uri $effectiveCudnnUrl -UseBasicParsing
 
+    $cudnnDownloadTasks = @()
     foreach ($rp in $cudnnManifest.psobject.Properties) {
         $winNode = $rp.Value.'windows-x86_64'
         if ($winNode) {
@@ -155,27 +215,30 @@ if (-not [string]::IsNullOrEmpty($targetCudnnVer)) {
                 if ($winNode.relative_path -match "cuda$activeCudaMajor" -or $winNode.relative_path -notmatch "cuda\d+") { $relPath = $winNode.relative_path }
             }
             if ($relPath) {
-                $dlUrl = "https://developer.download.nvidia.com/compute/cudnn/redist/$relPath"
-                if ($useProxy) { $dlUrl = "$proxyUrl/$dlUrl" }
+                $directUrl = "https://developer.download.nvidia.com/compute/cudnn/redist/$relPath"
+                $pUrl = if ($useProxy) { "$proxyUrl/$directUrl" } else { $directUrl }
                 $fName = Split-Path $relPath -Leaf
-                
-                $cudnnQueueLines += $dlUrl
-                $cudnnQueueLines += "  dir=$tempExtractDir"
-                $cudnnQueueLines += "  out=$fName"
-                $cudnnFilesToExtract += $fName
+
+                $cudnnDownloadTasks += [PSCustomObject]@{
+                    FileName     = $fName
+                    DirectUrl    = $directUrl
+                    ProxyUrl     = $pUrl
+                    ExpectedSize = [long]$winNode.size
+                }
             }
         }
     }
 
-    if ($cudnnQueueLines.Count -gt 0) {
-        Set-Content -Path $cudnnQueueFile -Value $cudnnQueueLines -Encoding UTF8
-        Write-Host "     [>] Batch Downloading $($cudnnFilesToExtract.Count) cuDNN Modules..." -ForegroundColor Gray
-        & $aria2 --input-file=$cudnnQueueFile -j 4 -x 4 -s 4 --console-log-level=warn | Out-Null
-        
-        foreach ($fName in $cudnnFilesToExtract) {
+    Download-And-Verify-Batch -Tasks $cudnnDownloadTasks -BatchName "cuDNN"
+
+    # Extract cuDNN DLLs
+    $uniqueCudnnFiles = $cudnnDownloadTasks | Select-Object -ExpandProperty FileName -Unique
+    foreach ($fName in $uniqueCudnnFiles) {
+        $srcZip = Join-Path $tempExtractDir $fName
+        if (Test-Path $srcZip) {
             Write-Host "     [>] Extracting cuDNN DLLs from $fName -> nvidia\cudnn\bin" -ForegroundColor Gray
             foreach ($filter in $cudnnTargets) {
-                & $7za e "$tempExtractDir\$fName" "-o$cudnnBinDir" $filter -r -y -bsp0 -bso0 | Out-Null
+                & $7za e $srcZip "-o$cudnnBinDir" $filter -r -y -bsp0 -bso0 | Out-Null
             }
         }
     }
@@ -184,5 +247,10 @@ if (-not [string]::IsNullOrEmpty($targetCudnnVer)) {
     Write-Host " [-] Could not resolve cuDNN version for CUDA $activeCudaMajor" -ForegroundColor Red
 }
 
-Remove-Item $tempExtractDir -Recurse -Force
+Remove-Item $tempExtractDir -Recurse -Force -ErrorAction SilentlyContinue
+
+# Verify DLL Count in Target Folders
+$finalCudaCount = (Get-ChildItem -Path $cudaBinDir -Filter "*.dll" -ErrorAction SilentlyContinue).Count
+$finalCudnnCount = (Get-ChildItem -Path $cudnnBinDir -Filter "*.dll" -ErrorAction SilentlyContinue).Count
+Write-Host " [*] Active Binaries Verified: CUDA ($finalCudaCount DLLs) | cuDNN ($finalCudnnCount DLLs)" -ForegroundColor Cyan
 Write-Host "`n [OK] Python + CUDA/cuDNN Deployment Completed for $TargetProjectName" -ForegroundColor Green
