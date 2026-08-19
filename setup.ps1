@@ -232,6 +232,17 @@ if (-not (Test-Path $pythonExe)) {
     Get-ChildItem -Path $pythonDir -Filter "*.exe" -Recurse | ForEach-Object { Unblock-File $_.FullName -ErrorAction SilentlyContinue }
     Remove-Item $pyNupkg -Force -ErrorAction SilentlyContinue
     Remove-Item $tempExtractDir -Recurse -Force -ErrorAction SilentlyContinue
+
+    # Bootstrap pip — NuGet Python does NOT include pip.exe by default
+    # Must run ensurepip so CI validations and Tier 2 projects can use pip
+    Write-Host " [*] Bootstrapping pip via ensurepip..." -ForegroundColor Cyan
+    & $pythonExe -m ensurepip --upgrade 2>&1 | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host " [WARN] ensurepip returned non-zero — pip may be absent." -ForegroundColor Yellow
+    } else {
+        Write-Host " [OK] pip bootstrapped into tools/python/Scripts/." -ForegroundColor DarkGray
+    }
+
     Write-Host " [OK] Python 3.12 Initialized (Native Portable via NuGet)." -ForegroundColor Green
 }
 
