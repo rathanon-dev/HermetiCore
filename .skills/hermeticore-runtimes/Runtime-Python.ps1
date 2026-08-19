@@ -81,20 +81,46 @@ if (-not (Test-Path (Join-Path $sourceTools "python.exe"))) { $sourceTools = $ou
 Copy-Item "$sourceTools\*" $projectRuntimeDir -Recurse -Force
 Remove-Item $tempExtractDir -Recurse -Force
 
-# 5. Bootstrap Pip & Inject Project-Scoped pip.ini
+# 5. Bootstrap Pip — same 3-step chain as setup.ps1
 $pyExe  = Join-Path $projectRuntimeDir "python.exe"
 $pipDir = Join-Path $projectRuntimeDir "Scripts"
+$pipExe = Join-Path $pipDir "pip.exe"
+
+# Step A: patch _pth if present (NuGet Python blocks sys.path without this)
+Get-ChildItem -Path $projectRuntimeDir -Filter "*._pth" -ErrorAction SilentlyContinue | ForEach-Object {
+    $c = Get-Content $_.FullName
+    $c = $c -replace '#\s*import site', 'import site'
+    Set-Content $_.FullName -Value $c
+    Write-Host " [*] Patched _pth: $($_.Name)" -ForegroundColor DarkGray
+}
+
+# Step B: ensurepip
 Write-Host " [*] Bootstrapping pip via ensurepip..." -ForegroundColor Cyan
 & $pyExe -m ensurepip --upgrade 2>&1 | Out-Null
-if ($LASTEXITCODE -ne 0) {
-    Write-Host " [WARN] ensurepip returned non-zero. Attempting pip self-upgrade fallback..." -ForegroundColor Yellow
-    & $pyExe -m pip install --upgrade pip 2>&1 | Out-Null
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host " [ERROR] pip bootstrap failed. Check network or proxy config." -ForegroundColor Red
-    }
-} else {
-    Write-Host " [OK] pip bootstrapped successfully." -ForegroundColor DarkGray
+
+# Step C: force-reinstall if pip.exe launcher still missing
+if (-not (Test-Path $pipExe)) {
+    Write-Host " [*] pip.exe missing — force-reinstalling to create launcher..." -ForegroundColor Yellow
+    & $pyExe -m pip install --force-reinstall --no-cache-dir pip 2>&1 | Out-Null
 }
+
+# Step D: fallback — get-pip.py via aria2c
+if (-not (Test-Path $pipExe)) {
+    Write-Host " [*] Fallback: downloading get-pip.py via aria2c..." -ForegroundColor Yellow
+    $getPipPath = Join-Path $projectRuntimeDir "get-pip.py"
+    & $aria2 -x 4 -s 4 -d $projectRuntimeDir -o "get-pip.py" "https://bootstrap.pypa.io/get-pip.py" | Out-Null
+    if (Test-Path $getPipPath) {
+        & $pyExe $getPipPath --no-warn-script-location 2>&1 | Out-Null
+        Remove-Item $getPipPath -Force -ErrorAction SilentlyContinue
+    }
+}
+
+if (Test-Path $pipExe) {
+    Write-Host " [OK] pip bootstrapped successfully." -ForegroundColor Green
+} else {
+    Write-Host " [ERROR] pip.exe not found after all bootstrap attempts." -ForegroundColor Red
+}
+
 
 if ($useProxy) {
     $proxyHost = ([System.Uri]$proxyUrl).Host
