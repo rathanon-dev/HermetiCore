@@ -201,3 +201,4 @@ if ((Test-Path $nodeExe) -and (Test-Path $npmCli)) {
 
 Remove-Item $tempDir -Recurse -Force -ErrorAction SilentlyContinue
 Write-Host "`n[SUCCESS] Tier 1 Toolchain Initialized." -ForegroundColor Green
+# Trigger CI from Antigravity
