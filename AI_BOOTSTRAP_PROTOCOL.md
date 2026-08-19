@@ -175,7 +175,7 @@ projects/<name>/sandbox/
 ## 📜 6. ข้อกำหนดการบันทึก Audit Log (Continuous Logging Policy)
 
 > **UPDATED POLICY:** โฟลเดอร์ `logs/` ถูกตั้งค่าเป็น **gitignored** (local-only) — ไม่มีการ commit log files ขึ้น GitHub อีกต่อไป
-> ไฟล์ log เช่น `logs/AI_MULTI_AGENT_LOG.md` ยังสามารถใช้งานได้บน local machine แต่จะไม่ถูก push ขึ้น repository
+> ไฟล์ log ต่างๆ ยังสามารถใช้งานได้บน local machine แต่จะไม่ถูก push ขึ้น repository
 
 สำหรับ AI Agent ที่ต้องการบันทึก session state:
 1. เขียน log ลงโฟลเดอร์ `logs/` ได้ตามปกติ (local-only, gitignored)
