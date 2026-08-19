@@ -1,3 +1,7 @@
+> **⚠️ Canonical Rules:** ดูกฎหลักทั้งหมดได้ที่ [`/AI_BOOTSTRAP_PROTOCOL.md`](../../AI_BOOTSTRAP_PROTOCOL.md) และ [`/GEMINI.md`](../../GEMINI.md)
+> เอกสารนี้เป็น expanded documentation สำหรับ human readers — ไม่ใช่ source of truth สำหรับ AI agents
+
+---
 <a id="top"></a>
 [🏠 หน้าหลัก (Home)](../../README.md) > [📚 เอกสารภาษาไทย (TH)] > 📄 **กฎเหล็กการแยกขาด 2 ชั้น (Two-Tier Rules)**
 
@@ -60,3 +64,4 @@
 **การนำทาง (Navigation):** [🏠 หน้าหลัก (Home)](../../README.md) | [🏛️ สถาปัตยกรรม (Architecture)](01_ARCHITECTURE.md) | [🔒 กฎ 2 ชั้น (Two-Tier Rules)](02_TWO_TIER_RULES.md) | [🎭 Playwright MCP](03_PLAYWRIGHT_MCP_SPEC.md) | [📜 ข้อกำหนด (Licenses)](04_TOOLING_AND_LICENSES.md) | [⬆️ กลับด้านบน (Top)](#top)
 
 **ผู้พัฒนาและดูแลโครงการ:** [@rathanon-dev](https://github.com/rathanon-dev) · **สัญญาอนุญาต:** [MIT](../../LICENSE)
+

@@ -7,13 +7,78 @@ on:
     branches: [ main ]
 
 jobs:
+  # ─── Linter: Rules Compliance Check ────────────────────────────────────────
+  rules-linter:
+    name: Rules Compliance Linter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: "Lint: No bare Invoke-WebRequest in .ps1 files"
+        run: |
+          echo "Scanning for banned Invoke-WebRequest usage in PowerShell scripts..."
+          # Allow only the documented exception in setup.ps1 (7-zip bootstrap)
+          VIOLATIONS=$(grep -rn "Invoke-WebRequest" --include="*.ps1" . \
+            | grep -v "setup\.ps1" \
+            | grep -v "# EXCEPTION" \
+            | grep -v "# BANNED" || true)
+          if [ -n "$VIOLATIONS" ]; then
+            echo "❌ FAIL: Invoke-WebRequest found in non-exempt .ps1 files:"
+            echo "$VIOLATIONS"
+            echo ""
+            echo "Use aria2c instead: & \$aria2 -x 8 -s 8 -d \$dir -o \$file \$url"
+            exit 1
+          fi
+          echo "✅ PASS: No banned Invoke-WebRequest usage found."
+
+      - name: "Lint: No dead file references in rule docs"
+        run: |
+          echo "Checking for references to deleted/gitignored files in rule docs..."
+          DEAD_REFS=0
+          # Check if AI_BOOTSTRAP_PROTOCOL.md still references logs/AI_MULTI_AGENT_LOG.md
+          if grep -q "logs/AI_MULTI_AGENT_LOG.md" AI_BOOTSTRAP_PROTOCOL.md 2>/dev/null; then
+            echo "❌ FAIL: AI_BOOTSTRAP_PROTOCOL.md references deleted logs/AI_MULTI_AGENT_LOG.md"
+            DEAD_REFS=1
+          fi
+          # Check if any rule file references SESSION_HANDOVER_LOG.md as a required artifact
+          if grep -rn "SESSION_HANDOVER_LOG.md" --include="*.md" . \
+            | grep -v ".gitignore" \
+            | grep -v "GEMINI.md" \
+            | grep -v "AI_BOOTSTRAP_PROTOCOL.md" \
+            | grep -v "# gitignored" | grep -q .; then
+            echo "⚠️  WARN: SESSION_HANDOVER_LOG.md referenced outside of expected rule context"
+          fi
+          if [ "$DEAD_REFS" -eq 1 ]; then exit 1; fi
+          echo "✅ PASS: No dead file references detected."
+
+      - name: "Lint: Commits on main have [AI:] prefix"
+        run: |
+          echo "Checking recent commit messages for [AI: ...] identity prefix..."
+          # Check last 5 commits (skip merge commits)
+          MISSING=$(git log --no-merges --oneline -5 --format="%s" \
+            | grep -v "^\[AI:" \
+            | grep -v "^Merge" || true)
+          if [ -n "$MISSING" ]; then
+            echo "⚠️  WARN: Some recent commits missing [AI: ModelName] prefix:"
+            echo "$MISSING"
+            echo ""
+            echo "Required format: [AI: Claude Sonnet 4.6 (Thinking)] fix(scope): description"
+            echo "See AI_BOOTSTRAP_PROTOCOL.md §2 for full commit identity spec."
+            # Warning only — not a hard failure (historical commits pre-date the rule)
+          else
+            echo "✅ PASS: All recent commits have [AI: ...] prefix."
+          fi
+
+  # ─── Tier 1 Windows CI ─────────────────────────────────────────────────────
   windows-matrix-test:
+    name: Windows CI (${{ matrix.shell }})
     runs-on: windows-latest
+    needs: rules-linter
     strategy:
       matrix:
         shell: [pwsh, powershell]
-    name: Windows CI (${{ matrix.shell }})
-    
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4

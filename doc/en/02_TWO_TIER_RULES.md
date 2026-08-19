@@ -1,33 +1,7 @@
-<a id="top"></a>
+# Two-Tier Hermetic Separation Standard
 
-# 🔒 Two-Tier Hermetic Separation Standard
-[⬅️ Back to Main README](../../README.md) | [🇹🇭 อ่านฉบับภาษาไทย](../th/02_TWO_TIER_RULES.md)
+> **This document has been consolidated into the master spec.**
+> **→ Read [`/AI_BOOTSTRAP_PROTOCOL.md`](../../AI_BOOTSTRAP_PROTOCOL.md) (sections 0–2) for the full Two-Tier rules.**
+> **→ Operational enforcement rules are in [`/GEMINI.md`](../../GEMINI.md).**
 
----
-
-## 1. Tier 1 (AI Control Plane)
-- **Location:** `tools/`, `.mcp/`, `.skills/`
-- **Scope:** Dedicated strictly to AI Agent Cognition & Orchestration.
-- **Host Detachment Axiom:** AI Agents MUST execute all tools using the hermetic Tier 1 toolchain (`tools/git`, `tools/node`, `tools/python`). **Never rely on or invoke global Host binaries.**
-- **Negative Rule:** Never execute `npm install` or `pip install` for project dependencies in Tier 1.
-
----
-
-## 2. Tier 2 (Project Data Plane)
-- **Location:** `projects/<project_name>/runtime/`
-- **Scope:** Isolated execution environment per project.
-- **Containment:** All dependencies (`node_modules`, `.venv`, CUDA DLLs) remain 100% confined inside that project pod without contaminating Tier 1 Base.
-
----
-
-## 3. Credential & Secret Isolation (Zero-Leak Policy)
-- **Location:** `config/.env`, `config/id_ed25519*`
-- **Scope:** Manages outbound authentication (GitHub MCP Server, Git CLI remotes).
-- **Device-Bound Axiom:** Every physical device (`MainPC` vs `Laptop`) MUST derive its own unique Ed25519 SSH Key and Fine-Grained PAT. **Never clone or copy private keys across devices** (The Lost Backpack Axiom).
-- **Zero-Leak Guarantee:** All `.env` files and SSH keys are 100% blocked by `.gitignore`, preventing accidental pushes to public repositories (See [config/README.md](../../config/README.md)).
-
----
-
-**Navigation:** [🏠 Home](../../README.md) | [🇹🇭 Thai](../../README.th.md) | [🇬🇧 English](../../README.en.md) | [🏛️ Architecture](01_ARCHITECTURE.md) | [🎭 Playwright MCP](03_PLAYWRIGHT_MCP_SPEC.md) | [🔑 Credentials Hub](../../config/README.md) | [⬆️ Back to Top](#top)
-
-**Maintainer:** [@rathanon-dev](https://github.com/rathanon-dev) · **License:** [MIT](../../LICENSE) · [View All Credits](../../README.md#-credits--acknowledgements)
+The authoritative Thai version with full diagrams is at [`doc/th/02_TWO_TIER_RULES.md`](../th/02_TWO_TIER_RULES.md).

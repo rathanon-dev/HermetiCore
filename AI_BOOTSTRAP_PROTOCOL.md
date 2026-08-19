@@ -172,13 +172,19 @@ projects/<name>/sandbox/
 
 ---
 
-## 📜 6. ข้อกำหนดการบันทึก Audit Log อย่างต่อเนื่อง (Continuous Multi-Agent Logging)
+## 📜 6. ข้อกำหนดการบันทึก Audit Log (Continuous Logging Policy)
 
-> **MANDATORY LOGGING RULE:** ทุกครั้งที่ AI Agent ทำการปรับปรุงโค้ด, รัน Stress-Test, หรือเปลี่ยนผ่านสเตจสำคัญ **จะต้องเพิ่มประวัติ (Append Log)** เข้าไปในไฟล์ **[`logs/AI_MULTI_AGENT_LOG.md`](logs/AI_MULTI_AGENT_LOG.md)** เสมอ
+> **UPDATED POLICY:** โฟลเดอร์ `logs/` ถูกตั้งค่าเป็น **gitignored** (local-only) — ไม่มีการ commit log files ขึ้น GitHub อีกต่อไป
+> ไฟล์ log เช่น `logs/AI_MULTI_AGENT_LOG.md` ยังสามารถใช้งานได้บน local machine แต่จะไม่ถูก push ขึ้น repository
 
-Format log:
+สำหรับ AI Agent ที่ต้องการบันทึก session state:
+1. เขียน log ลงโฟลเดอร์ `logs/` ได้ตามปกติ (local-only, gitignored)
+2. **ห้าม** สร้างไฟล์ log ใน root หรือ config/ โดยตรง
+3. สำหรับ session handover ระหว่าง AI agents ให้ใช้ git commit message แทน log files
+
+Format commit สำหรับ AI-to-AI handover:
 ```markdown
-| `YYYY-MM-DD HH:MM:SS` | `<AI Model Name>` | <Action Description> | `COMPLETED` | <Notes> |
+[AI: <Model Name>] handover(<scope>): <summary of state and next steps>
 ```
 
 ---

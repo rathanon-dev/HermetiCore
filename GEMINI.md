@@ -1,7 +1,8 @@
 # HermetiCore — AI Agent Rules (GEMINI.md)
 
-This file is read automatically by **Antigravity AI** (and compatible agents).
-All rules below are **mandatory**. Do not bypass them.
+> **⚠️ MANDATORY: Read [`AI_BOOTSTRAP_PROTOCOL.md`](AI_BOOTSTRAP_PROTOCOL.md) FIRST.**
+> That file is the master spec covering Tier architecture, sandbox rules, credentials, and commit identity.
+> This file (`GEMINI.md`) is loaded automatically by Antigravity AI and covers the **operational enforcement rules** not yet in the master spec.
 
 ---
 
@@ -12,7 +13,7 @@ All rules below are **mandatory**. Do not bypass them.
 # BANNED — use aria2c instead
 Invoke-WebRequest -Uri <url> -OutFile <file>
 Invoke-RestMethod -Uri <url>
-curl.exe (Windows built-in, single-threaded)
+curl.exe   # Windows built-in, single-threaded
 wget
 ```
 
@@ -63,16 +64,36 @@ npm install -g <package>       # Only allowed inside project runtime
 
 ---
 
+## 🔴 CRITICAL: Git Commit Identity — Model Stamping Required
+
+Every AI commit **MUST** include the model name. See full spec in [`AI_BOOTSTRAP_PROTOCOL.md §2`](AI_BOOTSTRAP_PROTOCOL.md).
+
+**Quick reference — always run before committing:**
+```powershell
+$git = ".\tools\git\cmd\git.exe"
+& $git config user.name  "Claude Sonnet 4.6"          # ← change to your model
+& $git config user.email "ai-claude-s4@metabase.local"
+& $git commit -m "[AI: Claude Sonnet 4.6 (Thinking)] fix(scope): description"
+```
+
+**Format:** `[AI: <Exact Model Name>] <type>(<scope>): <description>`
+
+Examples:
+- `[AI: Claude Sonnet 4.6 (Thinking)] fix(ci): bootstrap pip after NuGet install`
+- `[AI: Gemini 3.1 Pro] feat(mcp): add Neo4j server`
+
+**REJECTED (CI will flag these):**
+- `fix: some changes` ← no [AI:] prefix
+- `feat: add stuff` ← no model identity
+
+---
+
 ## 🟡 WARNING: Project Structure — Preserve Template
 
-**FORBIDDEN:**
 ```powershell
 # BANNED — destroys the blueprint
 Remove-Item projects\* -Recurse
-```
 
-**REQUIRED:**
-```powershell
 # CORRECT — delete specific project only
 Remove-Item projects\my-old-app -Recurse -Force
 # Template at projects\_template_fullstack MUST always be preserved
@@ -82,15 +103,16 @@ Remove-Item projects\my-old-app -Recurse -Force
 
 ## 🟡 WARNING: Git Push — Never Commit Sensitive Data
 
-The following are gitignored and must **NEVER** be committed:
-- `config/.env` — contains local secrets and proxy URLs
+Gitignored files — **NEVER** commit these:
+- `config/.env` — local secrets and proxy URLs
 - `config/id_ed25519*` — SSH private keys
 - `SESSION_HANDOVER_LOG.md` — local AI session state
 - `dump.txt` — debug dumps
 - `tools/` — downloaded binaries (auto-restored by setup.ps1)
-- `projects/*/runtime/` — downloaded language runtimes (auto-restored by Tier 2 scaffolders)
+- `projects/*/runtime/` — language runtimes (auto-restored by Tier 2 scaffolders)
+- `logs/` — local-only audit logs (gitignored entirely)
 
-Before any `git push`, always run:
+Before any push:
 ```powershell
 & ".\tools\git\cmd\git.exe" status
 # Verify no sensitive files appear in the staged list
@@ -98,21 +120,21 @@ Before any `git push`, always run:
 
 ---
 
-## 🟢 Tier Architecture Reference
+## 🟢 Tier Architecture Quick Reference
 
 | Tier | Scope | Location | Purpose |
 |------|-------|----------|---------|
 | **Tier 1** | Shared toolchain | `tools/` | 7zip, aria2c, git, node, python (base) |
-| **Tier 2** | Per-project isolation | `projects/<name>/runtime/tools/` | Sandboxed runtimes for each project |
+| **Tier 2** | Per-project isolation | `projects/<name>/runtime/tools/` | Sandboxed runtimes per project |
 
-**All Tier 2 scripts are in:** `.skills/hermeticore-runtimes/`
+**All Tier 2 scripts:** `.skills/hermeticore-runtimes/`
+**Full architecture:** [`AI_BOOTSTRAP_PROTOCOL.md`](AI_BOOTSTRAP_PROTOCOL.md) | [`doc/th/02_TWO_TIER_RULES.md`](doc/th/02_TWO_TIER_RULES.md)
 
 ---
 
 ## Proxy Configuration
 
-The project uses an optional OmniProxy LAN gateway.
-- URL is read from `config/.env` → `OMNIPROXY_URL`
-- Scripts auto-detect proxy availability via 1.2-second TCP handshake
-- If offline: falls back to direct internet download
+- URL read from `config/.env` → `OMNIPROXY_URL`
+- Scripts auto-detect proxy via 1.2-second TCP handshake
+- Falls back to direct internet if offline
 - Never hardcode proxy credentials in source files
