@@ -36,13 +36,15 @@ $tempExtractDir = Join-Path $root "projects\$TargetProjectName\runtime\temp_node
 if (Test-Path $tempExtractDir) { Remove-Item $tempExtractDir -Recurse -Force }
 New-Item -ItemType Directory -Path $tempExtractDir -Force | Out-Null
 
-$zipName = "node-v$NodeVersion-win-x64.zip"
-$rawUrl = "https://nodejs.org/dist/v$NodeVersion/$zipName"
-$dlUrl = if ($useProxy) { "$proxyUrl/$rawUrl" } else { $rawUrl }
-$zipPath = Join-Path $tempExtractDir $zipName
+# Auto-detect CPU architecture (matches Tier 1 setup.ps1 policy)
+$nodeArch = if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") { "arm64" } else { "x64" }
+$zipName  = "node-v$NodeVersion-win-$nodeArch.zip"
+$rawUrl   = "https://nodejs.org/dist/v$NodeVersion/$zipName"
+$dlUrl    = if ($useProxy) { "$proxyUrl/$rawUrl" } else { $rawUrl }
+$zipPath  = Join-Path $tempExtractDir $zipName
 
 $aria2 = Join-Path $root "tools\aria2\aria2c.exe"
-$7za = Join-Path $root "tools\7zip\7za.exe"
+$7za   = Join-Path $root "tools\7zip\7za.exe"
 
 # 3. Download & Integrity Verification with Poison-Cache Auto-Fallback
 Write-Host " [*] Fetching Node.js v$NodeVersion payload..." -ForegroundColor Cyan

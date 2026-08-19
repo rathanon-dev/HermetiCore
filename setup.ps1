@@ -1,12 +1,18 @@
 # ======================================================================
-# HermetiCore (HermetiCore) SELF-ASSEMBLING MASTER ENGINE (HARDENED v1.2)
+# HermetiCore SELF-ASSEMBLING MASTER ENGINE (HARDENED v1.3)
 # Standard: ISO/IEC/IEEE 12207 | Zero-Global-Pollution | Windows Bare-Metal
 # ======================================================================
-# ADHD-Audit Fixes Applied (v1.2):
+# v1.2 ADHD-Audit Fixes:
 #   - FIXED: Lockfile moved from temp/bootstrap.lock -> .setup-lock at root
 #   - FIXED: Root temp/ is now auto-deleted after all tools installed
 #   - FIXED: Drain barrier added to wait for child processes before temp wipe
 #   - POLICY: Root temp/ = TRANSIENT download staging ONLY, zero persistence
+# v1.3 Refactor:
+#   - POLICY: All downloads use aria2c (8-thread) AFTER bootstrap stage
+#   - NOTE:   7-zip bootstrap (step 6) intentionally uses Invoke-WebRequest
+#             because aria2c does not yet exist at that point in the chain.
+#             This is the ONLY permitted Invoke-WebRequest call in Tier 1.
+#   - ADDED:  ARM64 architecture auto-detection for Node.js and Python
 # ======================================================================
 [CmdletBinding()]
 param (
@@ -14,8 +20,9 @@ param (
     [Alias("p")][string]$ProxyOverride = ""
 )
 
-# 1. Enforce TLS 1.2 & TLS 1.3 across all .NET Web Handshakes
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls11 -bor [Net.SecurityProtocolType]::Tls
+# 1. Enforce TLS 1.2 minimum across all .NET Web Handshakes
+#    NOTE: TLS 1.0 and TLS 1.1 are intentionally excluded (deprecated/insecure)
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 -bor [Net.SecurityProtocolType]::Tls13
 
 $root = $PSScriptRoot
 if (-not $root) { $root = (Get-Location).Path }

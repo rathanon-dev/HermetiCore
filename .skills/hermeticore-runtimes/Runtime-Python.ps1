@@ -1,7 +1,10 @@
 param(
     [Parameter(Mandatory=$true)]
     [string]$TargetProjectName,
-    [string]$PythonVersion = "3.12.5"
+    [string]$PythonVersion = "3.12.5",
+    # Optional: space-separated pip packages to install after bootstrapping
+    # Example: -InstallPackages "fastapi uvicorn"
+    [string]$InstallPackages = ""
 )
 
 $root = (Resolve-Path "$PSScriptRoot\..\..").Path
@@ -79,9 +82,19 @@ Copy-Item "$sourceTools\*" $projectRuntimeDir -Recurse -Force
 Remove-Item $tempExtractDir -Recurse -Force
 
 # 5. Bootstrap Pip & Inject Project-Scoped pip.ini
-$pyExe = Join-Path $projectRuntimeDir "python.exe"
+$pyExe  = Join-Path $projectRuntimeDir "python.exe"
 $pipDir = Join-Path $projectRuntimeDir "Scripts"
-& $pyExe -m ensurepip --upgrade | Out-Null
+Write-Host " [*] Bootstrapping pip via ensurepip..." -ForegroundColor Cyan
+& $pyExe -m ensurepip --upgrade 2>&1 | Out-Null
+if ($LASTEXITCODE -ne 0) {
+    Write-Host " [WARN] ensurepip returned non-zero. Attempting pip self-upgrade fallback..." -ForegroundColor Yellow
+    & $pyExe -m pip install --upgrade pip 2>&1 | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host " [ERROR] pip bootstrap failed. Check network or proxy config." -ForegroundColor Red
+    }
+} else {
+    Write-Host " [OK] pip bootstrapped successfully." -ForegroundColor DarkGray
+}
 
 if ($useProxy) {
     $proxyHost = ([System.Uri]$proxyUrl).Host
@@ -93,11 +106,23 @@ trusted-host = $proxyHost
 timeout = 30
 "@
     Set-Content -Path $pipIniPath -Value $pipIniContent -Encoding ASCII
-    
+
     # Also set pip config internally
     & $pyExe -m pip config set global.index-url "$proxyUrl/pypi/simple/" | Out-Null
     & $pyExe -m pip config set global.trusted-host $proxyHost | Out-Null
     Write-Host " [+] Project-scoped pip.ini configured for OmniProxy ($pipIniPath)" -ForegroundColor Green
+}
+
+# 6. Optional: Install packages specified by -InstallPackages
+if ($InstallPackages) {
+    $pkgList = $InstallPackages -split '\s+' | Where-Object { $_ -ne "" }
+    Write-Host " [*] Installing packages: $($pkgList -join ', ')..." -ForegroundColor Cyan
+    & $pyExe -m pip install @pkgList 2>&1 | Tee-Object -Variable pipOut | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host " [WARN] One or more packages failed to install. Check output above." -ForegroundColor Yellow
+    } else {
+        Write-Host " [OK] Packages installed: $($pkgList -join ', ')" -ForegroundColor Green
+    }
 }
 
 Get-ChildItem $projectRuntimeDir -Filter "*.exe" -Recurse | ForEach-Object { Unblock-File $_.FullName -ErrorAction SilentlyContinue }
