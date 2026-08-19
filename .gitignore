@@ -22,11 +22,8 @@ __pycache__/
 venv/
 env/
 
-# System & Session Logs
-logs/*.jsonl
-logs/*.log
-!logs/AI_MULTI_AGENT_LOG.md
-!logs/ADHD_STRESS_TEST_REPORT.md
+# System & Session Logs (local-only — never commit to GitHub)
+logs/
 
 # Active Project Workspaces (Only keep the _template_fullstack)
 projects/*
