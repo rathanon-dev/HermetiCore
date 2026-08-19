@@ -15,3 +15,6 @@ SESSION_HANDOVER_LOG.md
 config/.env
 config/id_ed25519*
 
+# MCP Local Plugins
+node_modules/
+.agents/plugins/*/node_modules/

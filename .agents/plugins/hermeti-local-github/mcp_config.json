@@ -1,9 +1,9 @@
 {
   "mcpServers": {
     "hermeti-local-github": {
-      "command": "tools\\\\node\\\\node.exe",
+      "command": "tools\\node\\node.exe",
       "args": [
-        "tools\\\\mcp-servers\\\\node_modules\\\\@modelcontextprotocol\\\\server-github\\\\dist\\\\index.js"
+        "tools\\mcp-servers\\node_modules\\@modelcontextprotocol\\server-github\\dist\\index.js"
       ],
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "$env:GITHUB_PERSONAL_ACCESS_TOKEN"

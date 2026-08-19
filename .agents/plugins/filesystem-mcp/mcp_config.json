@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "filesystem-mcp": {
+      "command": "tools\\node\\node.exe",
+      "args": [
+        "tools\\mcp-servers\\node_modules\\@modelcontextprotocol\\server-filesystem\\dist\\index.js",
+        "./projects"
+      ]
+    }
+  }
+}

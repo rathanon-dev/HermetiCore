@@ -5,6 +5,7 @@ on:
     branches: [ main ]
     paths:
       - 'setup.ps1'
+      - 'config/mcp_fleet.json'
       - '.skills/hermeticore-runtimes/**'
       - '.github/workflows/**'
       - '.github/workflows/hermeticore-ci.yml'
@@ -20,7 +21,7 @@ concurrency:
 jobs:
   # ══════════════════════════════════════════════════════════════════
   # TIER 1 — Infrastructure smoke test
-  # Validates: 7zip, aria2c, git, node.exe, python.exe, pip.exe
+  # Validates: 7zip, aria2c, git, node.exe, python.exe, pip.exe, MCP Fleet
   # ══════════════════════════════════════════════════════════════════
   tier1-infrastructure:
     name: "Tier 1 — Infrastructure Setup"
@@ -38,6 +39,17 @@ jobs:
           Write-Host " OS: windows-latest | Arch: AMD64"
           Write-Host "=============================="
           ./setup.ps1
+
+      - name: Validate — 7-Zip & Aria2c Portable
+        shell: pwsh
+        run: |
+          $7zExe = "tools\7zip\7za.exe"
+          $ariaExe = "tools\aria2\aria2c.exe"
+          if (-not (Test-Path $7zExe)) { Write-Error "7-Zip binary missing at $7zExe"; exit 1 }
+          if (-not (Test-Path $ariaExe)) { Write-Error "Aria2c binary missing at $ariaExe"; exit 1 }
+          & $7zExe --help 2>&1 | Select-Object -First 2 | Write-Host
+          & $ariaExe --version | Select-Object -First 1 | Write-Host
+          Write-Host "[PASS] 7-Zip & Aria2c OK"
 
       - name: Validate — Node.js isolation & version
         shell: pwsh
@@ -80,6 +92,37 @@ jobs:
           $ver = git --version; Write-Host "[DEBUG] $ver"
           Write-Host "[PASS] Git portable OK"
 
+      - name: Validate — Local MCP Fleet & Antigravity Plugins
+        shell: pwsh
+        run: |
+          Write-Host "=== Validating Tier-1 Local MCP Fleet ==="
+          $mcpFleetFile = "config\mcp_fleet.json"
+          if (-not (Test-Path $mcpFleetFile)) { Write-Error "Missing $mcpFleetFile"; exit 1 }
+          $mcpFleet = Get-Content $mcpFleetFile -Raw | ConvertFrom-Json
+          $nodeExe = "tools\node\node.exe"
+
+          foreach ($mcp in $mcpFleet) {
+              Write-Host "Checking MCP: $($mcp.name)..."
+              $pluginDir = ".agents\plugins\$($mcp.name)"
+              $configFile = "$pluginDir\mcp_config.json"
+              $metaFile = "$pluginDir\plugin.json"
+              
+              if (-not (Test-Path $pluginDir)) { Write-Error "Plugin directory missing: $pluginDir"; exit 1 }
+              if (-not (Test-Path $configFile)) { Write-Error "mcp_config.json missing in $pluginDir"; exit 1 }
+              if (-not (Test-Path $metaFile)) { Write-Error "plugin.json missing in $pluginDir"; exit 1 }
+
+              # Validate JSON syntax
+              $cfg = Get-Content $configFile -Raw | ConvertFrom-Json
+              $meta = Get-Content $metaFile -Raw | ConvertFrom-Json
+              if ($null -eq $cfg.mcpServers.$($mcp.name)) { Write-Error "Malformed mcp_config.json for $($mcp.name)"; exit 1 }
+
+              # Validate entrypoint file exists
+              $entrypoint = $mcp.entrypoint
+              if (-not (Test-Path $entrypoint)) { Write-Error "Entrypoint missing for $($mcp.name): $entrypoint"; exit 1 }
+              Write-Host "  [OK] $($mcp.name) plugin & entrypoint verified."
+          }
+          Write-Host "[PASS] All Tier-1 MCP Plugins Verified."
+
       - name: Upload Tier 1 tools as artifact (reuse in Tier 2)
         uses: actions/upload-artifact@v4
         with:
@@ -90,6 +133,7 @@ jobs:
             tools/git/
             tools/node/
             tools/python/
+            tools/mcp-servers/
           retention-days: 1
 
   # ══════════════════════════════════════════════════════════════════

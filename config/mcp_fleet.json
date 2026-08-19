@@ -1,0 +1,40 @@
+[
+  {
+    "name": "filesystem-mcp",
+    "package": "@modelcontextprotocol/server-filesystem",
+    "description": "Filesystem Access MCP for Sandboxed Projects",
+    "entrypoint": "tools\\mcp-servers\\node_modules\\@modelcontextprotocol\\server-filesystem\\dist\\index.js",
+    "args": [
+      "./projects"
+    ]
+  },
+  {
+    "name": "playwright-mcp",
+    "package": "@executeautomation/playwright-mcp-server",
+    "description": "Playwright Browser MCP for UI Testing and Automation",
+    "entrypoint": "tools\\mcp-servers\\node_modules\\@executeautomation\\playwright-mcp-server\\dist\\index.js",
+    "args": [],
+    "env": {
+      "PLAYWRIGHT_BROWSERS_PATH": "tools\\playwright-browsers",
+      "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1",
+      "HEADLESS": "true"
+    }
+  },
+  {
+    "name": "redis-mcp",
+    "package": "@modelcontextprotocol/server-redis",
+    "description": "Redis In-Memory Cache & Key-Value MCP",
+    "entrypoint": "tools\\mcp-servers\\node_modules\\@modelcontextprotocol\\server-redis\\dist\\index.js",
+    "args": []
+  },
+  {
+    "name": "hermeti-local-github",
+    "package": "@modelcontextprotocol/server-github",
+    "description": "GitHub Version Control and API MCP",
+    "entrypoint": "tools\\mcp-servers\\node_modules\\@modelcontextprotocol\\server-github\\dist\\index.js",
+    "args": [],
+    "env": {
+      "GITHUB_PERSONAL_ACCESS_TOKEN": "$env:GITHUB_PERSONAL_ACCESS_TOKEN"
+    }
+  }
+]

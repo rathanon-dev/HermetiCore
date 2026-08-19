@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "redis-mcp": {
+      "command": "tools\\node\\node.exe",
+      "args": [
+        "tools\\mcp-servers\\node_modules\\@modelcontextprotocol\\server-redis\\dist\\index.js"
+      ]
+    }
+  }
+}

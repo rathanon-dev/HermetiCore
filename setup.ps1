@@ -149,54 +149,69 @@ if (-not (Test-Path $sshKeyPath)) {
 }
 
 # ------------------------------------------------------------------------------
-# 7. Local MCP Server Installation (GitHub)
+# 7. Local MCP Server Installation (Driven by config/mcp_fleet.json)
 # ------------------------------------------------------------------------------
-Write-Host " [*] Initializing Local MCP Server (GitHub) for Antigravity..." -ForegroundColor Cyan
-$mcpDir = Join-Path $toolsDir "mcp-servers"
-if (-not (Test-Path $mcpDir)) { New-Item -ItemType Directory -Path $mcpDir -Force | Out-Null }
-$nodeExe = Join-Path $toolsDir "node\node.exe"
-$npmCli = Join-Path $toolsDir "node\node_modules\npm\bin\npm-cli.js"
+$mcpFleetFile = Join-Path $root "config\mcp_fleet.json"
+if (Test-Path $mcpFleetFile) {
+    Write-Host " [*] Initializing Local MCP Servers from config\mcp_fleet.json..." -ForegroundColor Cyan
+    $mcpDir = Join-Path $toolsDir "mcp-servers"
+    if (-not (Test-Path $mcpDir)) { New-Item -ItemType Directory -Path $mcpDir -Force | Out-Null }
+    $nodeExe = Join-Path $toolsDir "node\node.exe"
+    $npmCli = Join-Path $toolsDir "node\node_modules\npm\bin\npm-cli.js"
 
-if ((Test-Path $nodeExe) -and (Test-Path $npmCli)) {
-    if (-not (Test-Path (Join-Path $mcpDir "package.json"))) {
-        Set-Content -Path (Join-Path $mcpDir "package.json") -Value '{"name":"hermeticore-mcp-servers","version":"1.0.0"}'
+    if ((Test-Path $nodeExe) -and (Test-Path $npmCli)) {
+        if (-not (Test-Path (Join-Path $mcpDir "package.json"))) {
+            Set-Content -Path (Join-Path $mcpDir "package.json") -Value '{"name":"hermeticore-mcp-servers","version":"1.0.0"}'
+        }
+        
+        $mcpFleet = Get-Content $mcpFleetFile -Raw | ConvertFrom-Json
+        $env:PATH = "$(Split-Path $nodeExe -Parent);" + $env:PATH
+
+        foreach ($mcp in $mcpFleet) {
+            Write-Host "     - Installing $($mcp.package) via local npm..."
+            # Use --ignore-scripts to prevent blocking browser downloads and background hangs
+            & $nodeExe $npmCli install $($mcp.package) --prefix $mcpDir --silent --ignore-scripts --registry=https://registry.npmjs.org/ | Out-Null
+            
+            $pluginDir = Join-Path $root ".agents\plugins\$($mcp.name)"
+            if (-not (Test-Path $pluginDir)) { New-Item -ItemType Directory -Path $pluginDir -Force | Out-Null }
+            
+            # Build args array for mcp_config.json
+            $allArgs = @($mcp.entrypoint)
+            if ($mcp.args) {
+                $allArgs += $mcp.args
+            }
+            
+            $serverDef = [ordered]@{
+                command = "tools\node\node.exe"
+                args    = $allArgs
+            }
+            if ($mcp.env) {
+                $envDict = [ordered]@{}
+                foreach ($prop in $mcp.env.PSObject.Properties) {
+                    $envDict[$prop.Name] = $prop.Value
+                }
+                $serverDef["env"] = $envDict
+            }
+
+            $mcpConfigObj = [ordered]@{
+                mcpServers = [ordered]@{
+                    $mcp.name = $serverDef
+                }
+            }
+            $mcpConfigJson = $mcpConfigObj | ConvertTo-Json -Depth 10
+            Set-Content -Path (Join-Path $pluginDir "mcp_config.json") -Value $mcpConfigJson
+            
+            $pluginObj = [ordered]@{
+                name        = $mcp.name
+                description = $mcp.description
+            }
+            $pluginJson = $pluginObj | ConvertTo-Json -Depth 10
+            Set-Content -Path (Join-Path $pluginDir "plugin.json") -Value $pluginJson
+        }
+        Write-Host " [OK] Local MCP Servers installed and registered as Antigravity Plugins." -ForegroundColor Green
+    } else {
+        Write-Host " [!] Node.js not found in Tier 1 tools; skipping MCP installation." -ForegroundColor Yellow
     }
-    
-    Write-Host "     - Installing @modelcontextprotocol/server-github via local npm..."
-    $env:PATH = "$(Split-Path $nodeExe -Parent);" + $env:PATH
-    & $nodeExe $npmCli install @modelcontextprotocol/server-github --prefix $mcpDir --silent | Out-Null
-    
-    # Configure Antigravity to support it via a local plugin
-    $pluginDir = Join-Path $root ".agents\plugins\hermeti-github-mcp"
-    if (-not (Test-Path $pluginDir)) { New-Item -ItemType Directory -Path $pluginDir -Force | Out-Null }
-    
-    $mcpConfigContent = @"
-{
-  "mcpServers": {
-    "hermeti-local-github": {
-      "command": "tools\\\\node\\\\node.exe",
-      "args": [
-        "tools\\\\mcp-servers\\\\node_modules\\\\@modelcontextprotocol\\\\server-github\\\\dist\\\\index.js"
-      ],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "`$env:GITHUB_PERSONAL_ACCESS_TOKEN"
-      }
-    }
-  }
-}
-"@
-    Set-Content -Path (Join-Path $pluginDir "mcp_config.json") -Value $mcpConfigContent
-    
-    $pluginJsonContent = @"
-{
-  "name": "hermeti-github-mcp",
-  "description": "Local GitHub MCP Server provided by HermetiCore Tier-1 tools."
-}
-"@
-    Set-Content -Path (Join-Path $pluginDir "plugin.json") -Value $pluginJsonContent
-    Write-Host " [OK] Local GitHub MCP Server installed and registered as Antigravity Plugin." -ForegroundColor Green
-} else {
-    Write-Host " [!] Node.js not found in Tier 1 tools; skipping MCP installation." -ForegroundColor Yellow
 }
 
 Remove-Item $tempDir -Recurse -Force -ErrorAction SilentlyContinue

@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "playwright-mcp": {
+      "command": "tools\\node\\node.exe",
+      "args": [
+        "tools\\mcp-servers\\node_modules\\@executeautomation\\playwright-mcp-server\\dist\\index.js"
+      ],
+      "env": {
+        "PLAYWRIGHT_BROWSERS_PATH": "tools\\playwright-browsers",
+        "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD": "1",
+        "HEADLESS": "true"
+      }
+    }
+  }
+}
